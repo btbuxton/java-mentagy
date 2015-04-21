@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.blabux.mentagy.domain.exception.PieceParseException;
+
 public class Piece implements Comparable<Piece> {
 	private static final char PEG_CHAR = '*';
 	private static final char BLANK_CHAR = '-';

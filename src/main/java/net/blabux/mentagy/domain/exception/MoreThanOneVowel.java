@@ -1,6 +1,8 @@
-package net.blabux.mentagy.domain;
+package net.blabux.mentagy.domain.exception;
 
 import java.util.List;
+
+import net.blabux.mentagy.domain.Cell;
 
 public class MoreThanOneVowel extends RuleViolation {
 	public MoreThanOneVowel(List<List<Cell>> lines) {

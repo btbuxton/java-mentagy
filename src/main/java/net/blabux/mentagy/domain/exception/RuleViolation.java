@@ -1,4 +1,4 @@
-package net.blabux.mentagy.domain;
+package net.blabux.mentagy.domain.exception;
 
 public class RuleViolation extends Exception {
 	private static final long serialVersionUID = 1979476305504070239L;

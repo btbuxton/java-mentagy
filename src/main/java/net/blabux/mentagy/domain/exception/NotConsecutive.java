@@ -1,4 +1,6 @@
-package net.blabux.mentagy.domain;
+package net.blabux.mentagy.domain.exception;
+
+import net.blabux.mentagy.domain.Cell;
 
 public class NotConsecutive extends RuleViolation {
 	final Cell previous;

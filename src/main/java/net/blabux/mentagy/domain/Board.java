@@ -10,6 +10,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import net.blabux.mentagy.domain.exception.BoardParseException;
+import net.blabux.mentagy.domain.exception.BoxNotFilled;
+import net.blabux.mentagy.domain.exception.MoreThanOneVowel;
+import net.blabux.mentagy.domain.exception.NotConsecutive;
+import net.blabux.mentagy.domain.exception.RuleViolation;
+
 public class Board {
 	private static final int MAX = 6;
 	final Cell[][] cells;

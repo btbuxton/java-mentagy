@@ -1,4 +1,4 @@
-package net.blabux.mentagy.domain;
+package net.blabux.mentagy.domain.exception;
 
 public class PieceParseException extends RuntimeException {
 	private static final long serialVersionUID = 3629700079003123049L;

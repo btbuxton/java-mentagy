@@ -16,13 +16,26 @@ public class Box {
 		cells.add(board.cell(x * 2 + 1, y * 2));
 		cells.add(board.cell(x * 2 + 1, y * 2 + 1));
 	}
-	
+
 	public boolean isFilled() {
 		return getCellsStream().noneMatch(Cell::isBlank);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			return equals((Box)obj);
+		} catch(ClassCastException ex) {
+			return false;
+		}
+	}
+	
+	public boolean equals(Box another) {
+		return this == another;
 	}
 
 	private Stream<Cell> getCellsStream() {
 		return cells.stream();
 	}
-	
+
 }

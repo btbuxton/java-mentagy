@@ -1,11 +1,11 @@
 package net.blabux.mentagy.domain;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Board {
@@ -33,34 +33,43 @@ public class Board {
 	}
 
 	public Stream<Cell> neighbors(int locX, int locY) {
-		List<Cell> result = new ArrayList<>();
-		for (int x = Math.max(0, locX - 1); x <= Math.min(MAX, locX + 1); x++) {
-			for (int y = Math.max(0, locY - 1); y <= Math.min(MAX, locY + 1); y++) {
-				if (x == locX && y == locY) {
-					continue;
-				}
-				result.add(cells[x][y]);
-			}
-		}
-		return result.stream();
+		// temp is needed to keep compiler happy
+		Stream<Stream<Cell>> temp = IntStream
+				.range(Math.max(0, locX - 1), Math.min(MAX, locX + 2))
+				.filter((x) -> x != locX)
+				.mapToObj(
+						(x) -> IntStream
+								.range(Math.max(0, locY - 1),
+										Math.min(MAX, locY + 2))
+								.filter((y) -> y != locY)
+								.mapToObj((y) -> cells[x][y]));
+		return temp.reduce(Stream.empty(), Stream::concat);
 	}
 
-	public void put(int x, int y, Piece piece) {
+	public void put(int x, int y, Piece piece) throws RuleViolation {
 		cell(x, y).set(piece);
 		checkRules();
 	}
 
-	private void checkRules() {
+	private void checkRules() throws RuleViolation {
 		onlyOneVowelInRowOneColumn();
 		allBoxesAreFilledInOrder();
 		piecesAreInOrder();
 	}
 
-	private void allBoxesAreFilledInOrder() {// the previous boxes must be
-												// filled before moving out
+	private void allBoxesAreFilledInOrder() throws RuleViolation {
 		Cell current = findMinimumStart();
 		Box currentBox = current.box();
-
+		while (null != current) {
+			Box nextBox = current.box();
+			if (!currentBox.equals(nextBox)) {
+				if (!currentBox.isFilled()) {
+					throw new BoxNotFilled(currentBox);
+				}
+				currentBox = nextBox;
+			}
+			current = current.next();
+		}
 	}
 
 	private Cell findMinimumStart() {
@@ -69,50 +78,45 @@ public class Board {
 	}
 
 	private Stream<Cell> allCells() {
-		List<Cell> result = new ArrayList<>();
-		cellsDo((cell) -> result.add(cell));
-		return result.stream();
-	}
-
-	private void cellsDo(Consumer<Cell> consumer) {
-		for (int x = 0; x < MAX; x++) {
-			for (int y = 0; y < MAX; y++) {
-				consumer.accept(cells[x][y]);
-			}
-		}
-	}
-
-	private void onlyOneVowelInRowOneColumn() {
-		Predicate<? super Stream<Cell>> hasOneOrLessVowels = (row) -> {
-			return row.filter(Cell::isVowel).count() <= 1;
-		};
-		rowStream().filter(hasOneOrLessVowels);
-		columnStream().filter(hasOneOrLessVowels);
-
+		return columnStream().reduce(Stream.empty(), Stream::concat);
 	}
 
 	private Stream<Stream<Cell>> columnStream() {
-		List<Stream<Cell>> result = new ArrayList<>();
-		for (int x = 0; x < MAX; x++) {
-			result.add(Arrays.asList(cells[x]).stream());
-		}
-		return result.stream();
+		return IntStream.range(0, MAX).mapToObj((x) -> Arrays.stream(cells[x]));
 	}
 
 	private Stream<Stream<Cell>> rowStream() {
-		List<Stream<Cell>> result = new ArrayList<>();
-		for (int y = 0; y < MAX; y++) {
-			List<Cell> row = new ArrayList<>();
-			for (int x = 0; x < MAX; x++) {
-				row.add(cells[x][y]);
-			}
-			result.add(row.stream());
-		}
-		return result.stream();
+		return IntStream.range(0, MAX).mapToObj(
+				(y) -> IntStream.range(0, MAX).mapToObj((x) -> cells[x][y]));
 	}
 
-	private void piecesAreInOrder() {
+	private void onlyOneVowelInRowOneColumn() throws RuleViolation {
+		Function<Stream<Stream<Cell>>, Stream<List<Cell>>> findVowels = (stream) -> {
+			return stream
+					.map((row) -> row.filter(Cell::isVowel).collect(
+							Collectors.toList())).collect(Collectors.toList())
+					.stream().filter((list) -> list.size() > 1);
+		};
+		Stream<List<Cell>> badRows = findVowels.apply(rowStream());
+		Stream<List<Cell>> badColumns = findVowels.apply(columnStream());
+		List<List<Cell>> violations = Stream.concat(badRows, badColumns)
+				.collect(Collectors.toList());
+		if (violations.size() > 0) {
+			throw new MoreThanOneVowel(violations);
+		}
+	}
 
+	private void piecesAreInOrder() throws RuleViolation {
+		Cell current = findMinimumStart();
+		while (null != current) {
+			Cell next = current.next();
+			if (null == next)
+				break;
+			if (current.neighbors().noneMatch((cell) -> cell.equals(next))) {
+				throw new NotConsecutive(current, next);
+			}
+			current = next;
+		}
 	}
 
 	private void initializeCells() {

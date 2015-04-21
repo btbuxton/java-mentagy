@@ -5,8 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class Piece implements Comparable<Piece> {
-	public final static Piece BLANK = new Piece(' ');
-	public final static Piece FILLER = new Piece('*');
+	private static final char PEG_CHAR = '*';
+	private static final char BLANK_CHAR = ' ';
+	public final static Piece BLANK = new Piece(BLANK_CHAR);
+	public final static Piece PEG = new Piece(PEG_CHAR);
 	public final static List<Piece> ALL;
 
 	final char value;
@@ -19,6 +21,19 @@ public class Piece implements Comparable<Piece> {
 		}
 		ALL = Collections.unmodifiableList(temp);
 	}
+	
+	public static Piece parse(char value) {
+		if (BLANK_CHAR == value) {
+			return BLANK;
+		}
+		if (PEG_CHAR == value) {
+			return PEG;
+		}
+		if ('a' <= value && 'z' >= value) {
+			return ALL.get(value - 'a');
+		}
+		throw new PieceParseException(value);
+	}
 
 	private Piece(char value) {
 		this.value = value;
@@ -28,8 +43,8 @@ public class Piece implements Comparable<Piece> {
 		return this == BLANK;
 	}
 
-	public boolean isFiller() {
-		return this == FILLER;
+	public boolean isPeg() {
+		return this == PEG;
 	}
 
 	public boolean isVowel() {
@@ -51,10 +66,10 @@ public class Piece implements Comparable<Piece> {
 		if (another.isBlank()) {
 			return 1;
 		}
-		if (isFiller()) {
+		if (isPeg()) {
 			return -1;
 		}
-		if (another.isFiller()) {
+		if (another.isPeg()) {
 			return 1;
 		}
 		if (value < another.value)
@@ -63,14 +78,27 @@ public class Piece implements Comparable<Piece> {
 			return 1;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			return equals((Piece) obj);
+		} catch (ClassCastException ex) {
+			return false;
+		}
+	}
+
+	public boolean equals(Piece another) {
+		return value == another.value;
+	}
+
 	public boolean isAlphabetical() {
-		return !(isBlank() || isFiller());
+		return !(isBlank() || isPeg());
 	}
 
 	public Piece next() {
 		if (value == 'z') {
 			return null;
 		}
-		return ALL.get(value - 'a');
+		return ALL.get(value - 'a' + 1);
 	}
 }

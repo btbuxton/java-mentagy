@@ -48,5 +48,16 @@ public class Cell implements Comparable<Cell> {
 	public int compareTo(Cell another) {
 		return piece.compareTo(another.piece);
 	}
+	
+	public Cell next() {
+		if (!piece.isAlphabetical()) {
+			return null;
+		}
+		Piece next = piece.next();
+		if (null == next) {
+			return null;
+		}
+		return board.neighbors(x, y).filter((cell) -> cell.piece.equals(next)).findAny().get();
+	}
 
 }

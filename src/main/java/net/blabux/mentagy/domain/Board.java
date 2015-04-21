@@ -1,6 +1,8 @@
 package net.blabux.mentagy.domain;
 
+import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -49,6 +51,31 @@ public class Board {
 	public void put(int x, int y, Piece piece) throws RuleViolation {
 		cell(x, y).set(piece);
 		checkRules();
+	}
+
+	public void parse(Stream<String> rows) {
+		Iterator<String> iterator = rows.iterator();
+		IntStream.range(0, MAX).forEachOrdered((y) -> {
+			StringReader reader = new StringReader(iterator.next());
+			IntStream.range(0, MAX).forEachOrdered((x) -> {
+				try {
+					Piece piece = Piece.parse((char) reader.read());
+					cell(x, y).set(piece);
+				} catch (Exception ex) {
+					throw new BoardParseException(ex);
+				}
+			});
+		});
+	}
+	
+	public Stream<String> output() {
+		return rowStream().map((row) -> {
+			StringBuilder builder = new StringBuilder();
+			row.forEach((cell) -> {
+				builder.append(cell.value());
+			});
+			return builder.toString();
+		});
 	}
 
 	private void checkRules() throws RuleViolation {

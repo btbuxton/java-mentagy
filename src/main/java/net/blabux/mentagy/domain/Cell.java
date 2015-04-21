@@ -32,7 +32,7 @@ public class Cell implements Comparable<Cell> {
 	}
 
 	public void set(Piece piece) {
-		assert piece.isBlank();
+		assert this.piece.isBlank();
 		this.piece = piece;
 	}
 
@@ -58,6 +58,10 @@ public class Cell implements Comparable<Cell> {
 			return null;
 		}
 		return board.neighbors(x, y).filter((cell) -> cell.piece.equals(next)).findAny().get();
+	}
+
+	public String value() {
+		return piece.value();
 	}
 
 }

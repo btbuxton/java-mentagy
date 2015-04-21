@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Piece implements Comparable<Piece> {
 	private static final char PEG_CHAR = '*';
-	private static final char BLANK_CHAR = ' ';
+	private static final char BLANK_CHAR = '-';
 	public final static Piece BLANK = new Piece(BLANK_CHAR);
 	public final static Piece PEG = new Piece(PEG_CHAR);
 	public final static List<Piece> ALL;
@@ -21,7 +21,7 @@ public class Piece implements Comparable<Piece> {
 		}
 		ALL = Collections.unmodifiableList(temp);
 	}
-	
+
 	public static Piece parse(char value) {
 		if (BLANK_CHAR == value) {
 			return BLANK;
@@ -29,6 +29,7 @@ public class Piece implements Comparable<Piece> {
 		if (PEG_CHAR == value) {
 			return PEG;
 		}
+		value = Character.toLowerCase(value);
 		if ('a' <= value && 'z' >= value) {
 			return ALL.get(value - 'a');
 		}

@@ -29,15 +29,15 @@ public class Board {
 	}
 
 	public Cell cell(int x, int y) {
-		assert x >= 0 && x <= MAX;
-		assert y >= 0 && y <= MAX;
+		assert x >= 0 && x < MAX;
+		assert y >= 0 && y < MAX;
 		return cells[x][y];
 	}
 
 	public Box box(int x, int y) {
-		assert x >= 0 && x <= MAX;
-		assert y >= 0 && y <= MAX;
-		return boxes[x / 2][y / 2];
+		assert x >= 0 && x < MAX / 2;
+		assert y >= 0 && y < MAX / 2;
+		return boxes[x][y];
 	}
 
 	public Stream<Cell> neighbors(int locX, int locY) {
@@ -165,8 +165,8 @@ public class Board {
 	}
 
 	private void fill(int i, int j, BiConsumer<Integer, Integer> consumer) {
-		for (int x = 0; x < i; x++) {
-			for (int y = 0; y < j; y++) {
+		for (int y = 0; y < i; y++) {
+			for (int x = 0; x < j; x++) {
 				consumer.accept(x, y);
 			}
 		}

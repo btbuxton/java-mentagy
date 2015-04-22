@@ -1,9 +1,9 @@
 package net.blabux.mentagy.start;
 
-import net.blabux.mentagy.gui.BoardPanel;
+import net.blabux.mentagy.gui.BoardComponent;
 
 public class Mentagy {
-	private BoardPanel panel;
+	private BoardComponent panel;
 	
 	public static void main(String[] args) {
 		Mentagy instance = new Mentagy();
@@ -11,7 +11,7 @@ public class Mentagy {
 	}
 
 	private void start() {
-		panel = new BoardPanel();
+		panel = new BoardComponent();
 		panel.show();
 	}
 

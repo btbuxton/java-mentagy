@@ -12,13 +12,17 @@ public class Box {
 		this.board = board;
 		cells = new ArrayList<Cell>(4);
 		cells.add(board.cell(x * 2, y * 2));
-		cells.add(board.cell(x * 2, y * 2 + 1));
 		cells.add(board.cell(x * 2 + 1, y * 2));
+		cells.add(board.cell(x * 2, y * 2 + 1));
 		cells.add(board.cell(x * 2 + 1, y * 2 + 1));
 	}
 
 	public boolean isFilled() {
 		return getCellsStream().noneMatch(Cell::isBlank);
+	}
+	
+	public Stream<Cell> cells() {
+		return cells.stream();
 	}
 
 	@Override

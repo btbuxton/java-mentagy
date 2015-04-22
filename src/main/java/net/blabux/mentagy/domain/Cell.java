@@ -48,7 +48,7 @@ public class Cell implements Comparable<Cell> {
 	public int compareTo(Cell another) {
 		return piece.compareTo(another.piece);
 	}
-	
+
 	public Cell next() {
 		if (!piece.isAlphabetical()) {
 			return null;
@@ -57,11 +57,21 @@ public class Cell implements Comparable<Cell> {
 		if (null == next) {
 			return null;
 		}
-		return board.neighbors(x, y).filter((cell) -> cell.piece.equals(next)).findAny().get();
+		return board.neighbors(x, y).filter((cell) -> cell.piece.equals(next))
+				.findAny().get();
 	}
 
 	public String value() {
 		return piece.value();
+	}
+
+	public String toString() {
+		return new StringBuilder().append(x).append('@').append(y).append('=')
+				.append(value()).toString();
+	}
+
+	public boolean isPeg() {
+		return piece.isPeg();
 	}
 
 }

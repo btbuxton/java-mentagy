@@ -104,4 +104,11 @@ public class Piece implements Comparable<Piece> {
 		}
 		return ALL.get(value - 'a' + 1);
 	}
+
+	public Piece previous() {
+		if ('a' == value) {
+			return null;
+		}
+		return ALL.get(value - 'a' - 1);
+	}
 }

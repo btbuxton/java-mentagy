@@ -19,7 +19,7 @@ public class BoxComponent extends JPanel {
 
 	private void initialize() {
 		setBorder(new LineBorder(Color.BLACK, 2));
-		setLayout(new GridLayout(2, 2, 1, 1));
+		setLayout(new GridLayout(2, 2, 2, 2));
 		box.cells().forEach((cell) -> {
 			add(new CellComponent(cell));
 		});

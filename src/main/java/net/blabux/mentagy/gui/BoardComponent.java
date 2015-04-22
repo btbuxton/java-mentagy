@@ -22,7 +22,7 @@ public class BoardComponent extends JPanel {
 	public void show() {
 		frame = new JFrame("Mentagy");
 		frame.add(this);
-		frame.setSize(640, 480);
+		frame.setSize(480, 480);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}

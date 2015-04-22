@@ -2,6 +2,7 @@ package net.blabux.mentagy.domain;
 
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -44,12 +45,11 @@ public class Board {
 		// temp is needed to keep compiler happy
 		Stream<Stream<Cell>> temp = IntStream
 				.range(Math.max(0, locX - 1), Math.min(MAX, locX + 2))
-				.filter((x) -> x != locX)
 				.mapToObj(
 						(x) -> IntStream
 								.range(Math.max(0, locY - 1),
 										Math.min(MAX, locY + 2))
-								.filter((y) -> y != locY)
+								.filter((y) -> !(x == locX && y == locY))
 								.mapToObj((y) -> cells[x][y]));
 		return temp.reduce(Stream.empty(), Stream::concat);
 	}
@@ -67,6 +67,9 @@ public class Board {
 				try {
 					Piece piece = Piece.parse((char) reader.read());
 					cell(x, y).set(piece);
+					if (piece.isPeg() || piece.isAlphabetical()) {
+						cell(x,y).lock();
+					}
 				} catch (Exception ex) {
 					throw new BoardParseException(ex);
 				}
@@ -84,13 +87,14 @@ public class Board {
 		});
 	}
 
-	private void checkRules() throws RuleViolation {
+	void checkRules() throws RuleViolation {
 		onlyOneVowelInRowOneColumn();
 		allBoxesAreFilledInOrder();
 		piecesAreInOrder();
 	}
 
 	private void allBoxesAreFilledInOrder() throws RuleViolation {
+		//TODO doesn't catch violations early enough
 		Cell current = findMinimumStart();
 		Box currentBox = current.box();
 		while (null != current) {
@@ -140,6 +144,7 @@ public class Board {
 	}
 
 	private void piecesAreInOrder() throws RuleViolation {
+		//TODO fix
 		Cell current = findMinimumStart();
 		while (null != current) {
 			Cell next = current.next();

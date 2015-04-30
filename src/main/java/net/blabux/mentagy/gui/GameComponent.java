@@ -1,17 +1,12 @@
 package net.blabux.mentagy.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.util.stream.IntStream;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
 public class GameComponent extends JPanel {
@@ -26,8 +21,9 @@ public class GameComponent extends JPanel {
 		JPanel result = new JPanel();
 		result.setBorder(new EmptyBorder(5,5,5,5));
 		result.setLayout(new BoxLayout(result,BoxLayout.X_AXIS));
-		result.add(Box.createHorizontalGlue());
+
 		IntStream.range(0, 10).forEach((index) -> {
+			result.add(Box.createHorizontalGlue());
 			result.add(createFreePiece());
 		});
 		result.add(Box.createHorizontalGlue());
@@ -35,28 +31,16 @@ public class GameComponent extends JPanel {
 	}
 
 	private JComponent createFreePiece() {
-		JComponent result = new JComponent() {
-			private static final long serialVersionUID = -66353523590534066L;
-
-			@Override
-			protected void paintComponent(Graphics g) {
-				Rectangle bounds = g.getClipBounds();
-				g.setColor(Color.DARK_GRAY);
-				g.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
-			}
-		};
-		result.setMinimumSize(new Dimension(32, 32));
-		result.setMaximumSize(new Dimension(32, 32));
-		result.setPreferredSize(new Dimension(32,32));
-		return result;
+		return new PieceComponent();
 	}
 
 	private JComponent createLeftPanel() {
 		JPanel result = new JPanel();
 		result.setBorder(new EmptyBorder(5,5,5,5));
 		result.setLayout(new BoxLayout(result,BoxLayout.Y_AXIS));
-		result.add(Box.createVerticalGlue());
+
 		IntStream.range(0, 10).forEach((index) -> {
+			result.add(Box.createVerticalGlue());
 			result.add(createFreePiece());
 		});
 		result.add(Box.createVerticalGlue());
@@ -67,8 +51,9 @@ public class GameComponent extends JPanel {
 		JPanel result = new JPanel();
 		result.setBorder(new EmptyBorder(5,5,5,5));
 		result.setLayout(new BoxLayout(result,BoxLayout.Y_AXIS));
-		result.add(Box.createVerticalGlue());
+
 		IntStream.range(0, 10).forEach((index) -> {
+			result.add(Box.createVerticalGlue());
 			result.add(createFreePiece());
 		});
 		result.add(Box.createVerticalGlue());
@@ -79,8 +64,9 @@ public class GameComponent extends JPanel {
 		JPanel result = new JPanel();
 		result.setBorder(new EmptyBorder(5,5,5,5));
 		result.setLayout(new BoxLayout(result,BoxLayout.X_AXIS));
-		result.add(Box.createHorizontalGlue());
+
 		IntStream.range(0, 10).forEach((index) -> {
+			result.add(Box.createHorizontalGlue());
 			result.add(createFreePiece());
 		});
 		result.add(Box.createHorizontalGlue());
@@ -90,7 +76,6 @@ public class GameComponent extends JPanel {
 	private void initialize() {
 		board = new BoardComponent();
 		setLayout(new BorderLayout(2, 2));
-		setBorder(new BevelBorder(BevelBorder.RAISED));
 		add(board, BorderLayout.CENTER);
 		add(createLeftPanel(), BorderLayout.WEST);
 		add(createRightPanel(), BorderLayout.EAST);

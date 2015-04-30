@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -14,7 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.border.LineBorder;
 
 import net.blabux.mentagy.domain.Cell;
@@ -22,13 +21,20 @@ import net.blabux.mentagy.domain.Piece;
 import net.blabux.mentagy.domain.exception.PieceParseException;
 import net.blabux.mentagy.domain.exception.RuleViolation;
 
-public class CellComponent extends JPanel {
+public class CellComponent extends JComponent {
 	private static final long serialVersionUID = -1992880940315958022L;
 	final Cell cell;
 
 	public CellComponent(Cell cell) {
 		this.cell = cell;
 		initialize();
+	}
+
+	@Override
+	public void addNotify() {
+		super.addNotify();
+		Font biggerFont = getFont().deriveFont(48.0f).deriveFont(Font.BOLD);
+		setFont(biggerFont);
 	}
 
 	@Override
@@ -56,11 +62,8 @@ public class CellComponent extends JPanel {
 	}
 
 	private void centerText(Graphics g, String text) {
-		Graphics2D g2d = (Graphics2D) g;
-		Font biggerFont = g2d.getFont().deriveFont(48.0f).deriveFont(Font.BOLD);
-		g2d.setFont(biggerFont);
-		FontMetrics fm = g2d.getFontMetrics();
-		Rectangle2D r = fm.getStringBounds(text, g2d);
+		FontMetrics fm = g.getFontMetrics();
+		Rectangle2D r = fm.getStringBounds(text, g);
 		int x = (this.getWidth() - (int) r.getWidth()) / 2;
 		int y = (this.getHeight() - (int) r.getHeight()) / 2 + fm.getAscent();
 		g.drawString(text, x, y);

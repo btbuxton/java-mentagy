@@ -2,18 +2,13 @@ package net.blabux.mentagy.domain;
 
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import net.blabux.mentagy.domain.exception.BoardParseException;
 import net.blabux.mentagy.domain.exception.BoxNotFilled;
-import net.blabux.mentagy.domain.exception.MoreThanOneVowel;
 import net.blabux.mentagy.domain.exception.NotConsecutive;
 import net.blabux.mentagy.domain.exception.RuleViolation;
 
@@ -29,34 +24,37 @@ public class Board {
 		initializeBoxes();
 	}
 
-	public Cell cell(int x, int y) {
-		assert x >= 0 && x < MAX;
-		assert y >= 0 && y < MAX;
-		return cells[x][y];
-	}
-
 	public Box box(int x, int y) {
 		assert x >= 0 && x < MAX / 2;
 		assert y >= 0 && y < MAX / 2;
 		return boxes[x][y];
 	}
 
+	public Cell cell(int x, int y) {
+		assert x >= 0 && x < MAX;
+		assert y >= 0 && y < MAX;
+		return cells[x][y];
+	}
+
 	public Stream<Cell> neighbors(int locX, int locY) {
 		// temp is needed to keep compiler happy
-		Stream<Stream<Cell>> temp = IntStream
-				.range(Math.max(0, locX - 1), Math.min(MAX, locX + 2))
-				.mapToObj(
+		Stream<Stream<Cell>> temp = IntStream.range(Math.max(0, locX - 1),
+				Math.min(MAX, locX + 2)).mapToObj(
 						(x) -> IntStream
-								.range(Math.max(0, locY - 1),
-										Math.min(MAX, locY + 2))
-								.filter((y) -> !(x == locX && y == locY))
-								.mapToObj((y) -> cells[x][y]));
+						.range(Math.max(0, locY - 1), Math.min(MAX, locY + 2))
+						.filter((y) -> !(x == locX && y == locY))
+						.mapToObj((y) -> cells[x][y]));
 		return temp.reduce(Stream.empty(), Stream::concat);
 	}
 
-	public void put(int x, int y, Piece piece) throws RuleViolation {
-		cell(x, y).set(piece);
-		checkRules();
+	public Stream<String> output() {
+		return rowStream().map((row) -> {
+			StringBuilder builder = new StringBuilder();
+			row.forEach((cell) -> {
+				builder.append(cell.value());
+			});
+			return builder.toString();
+		});
 	}
 
 	public void parse(Stream<String> rows) {
@@ -68,7 +66,7 @@ public class Board {
 					Piece piece = Piece.parse((char) reader.read());
 					cell(x, y).set(piece);
 					if (piece.isPeg() || piece.isAlphabetical()) {
-						cell(x,y).lock();
+						cell(x, y).lock();
 					}
 				} catch (Exception ex) {
 					throw new BoardParseException(ex);
@@ -76,25 +74,14 @@ public class Board {
 			});
 		});
 	}
-	
-	public Stream<String> output() {
-		return rowStream().map((row) -> {
-			StringBuilder builder = new StringBuilder();
-			row.forEach((cell) -> {
-				builder.append(cell.value());
-			});
-			return builder.toString();
-		});
-	}
 
-	void checkRules() throws RuleViolation {
-		onlyOneVowelInRowOneColumn();
-		allBoxesAreFilledInOrder();
-		piecesAreInOrder();
+	public void put(int x, int y, Piece piece) throws RuleViolation {
+		cell(x, y).set(piece);
+		checkRules();
 	}
 
 	private void allBoxesAreFilledInOrder() throws RuleViolation {
-		//TODO doesn't catch violations early enough
+		// TODO doesn't catch violations early enough
 		Cell current = findMinimumStart();
 		Box currentBox = current.box();
 		while (null != current) {
@@ -109,11 +96,6 @@ public class Board {
 		}
 	}
 
-	private Cell findMinimumStart() {
-		return allCells().filter(Cell::isAlphabetical).sorted().findFirst()
-				.get();
-	}
-
 	private Stream<Cell> allCells() {
 		return columnStream().reduce(Stream.empty(), Stream::concat);
 	}
@@ -122,29 +104,59 @@ public class Board {
 		return IntStream.range(0, MAX).mapToObj((x) -> Arrays.stream(cells[x]));
 	}
 
-	private Stream<Stream<Cell>> rowStream() {
-		return IntStream.range(0, MAX).mapToObj(
-				(y) -> IntStream.range(0, MAX).mapToObj((x) -> cells[x][y]));
-	}
-
-	private void onlyOneVowelInRowOneColumn() throws RuleViolation {
-		Function<Stream<Stream<Cell>>, Stream<List<Cell>>> findVowels = (stream) -> {
-			return stream
-					.map((row) -> row.filter(Cell::isVowel).collect(
-							Collectors.toList())).collect(Collectors.toList())
-					.stream().filter((list) -> list.size() > 1);
-		};
-		Stream<List<Cell>> badRows = findVowels.apply(rowStream());
-		Stream<List<Cell>> badColumns = findVowels.apply(columnStream());
-		List<List<Cell>> violations = Stream.concat(badRows, badColumns)
-				.collect(Collectors.toList());
-		if (violations.size() > 0) {
-			throw new MoreThanOneVowel(violations);
+	private void fill(int i, int j, BiConsumer<Integer, Integer> consumer) {
+		for (int y = 0; y < i; y++) {
+			for (int x = 0; x < j; x++) {
+				consumer.accept(x, y);
+			}
 		}
 	}
 
+	private Cell findMinimumStart() {
+		return allCells().filter(Cell::isAlphabetical).sorted().findFirst()
+				.get();
+	}
+
+	private void initializeBoxes() {
+		fill(3, 3, (x, y) -> {
+			boxes[x][y] = new Box(this, x, y);
+		});
+	}
+
+	private void initializeCells() {
+		fill(MAX, MAX, (x, y) -> {
+			cells[x][y] = new Cell(this, x, y);
+		});
+	}
+
+	private void onlyOneVowelInRowOneColumn() throws RuleViolation {
+		/*
+		 * List<Cell> badCells = allCells().filter((cell) -> { Piece next =
+		 * cell.get().next(); Piece prev = cell.get().previous(); // check each
+		 * piece against Predicate<Piece> check = (piece) -> { return
+		 * cell.neighbors().anyMatch((toCheck) -> { return
+		 * toCheck.get().equals(piece); }); }; if (next != null) {
+		 * 
+		 * } if (prev != null) {
+		 * 
+		 * } }).collect(Collectors.toList());
+		 */
+		/*
+		 * Function<Stream<Stream<Cell>>, Stream<List<Cell>>> findVowels =
+		 * (stream) -> { return stream .map((row) ->
+		 * row.filter(Cell::isVowel).collect(
+		 * Collectors.toList())).collect(Collectors.toList())
+		 * .stream().filter((list) -> list.size() > 1); }; Stream<List<Cell>>
+		 * badRows = findVowels.apply(rowStream()); Stream<List<Cell>>
+		 * badColumns = findVowels.apply(columnStream()); List<List<Cell>>
+		 * violations = Stream.concat(badRows, badColumns)
+		 * .collect(Collectors.toList()); if (violations.size() > 0) { throw new
+		 * MoreThanOneVowel(violations); }
+		 */
+	}
+
 	private void piecesAreInOrder() throws RuleViolation {
-		//TODO fix
+		// TODO fix
 		Cell current = findMinimumStart();
 		while (null != current) {
 			Cell next = current.next();
@@ -157,24 +169,15 @@ public class Board {
 		}
 	}
 
-	private void initializeCells() {
-		fill(MAX, MAX, (x, y) -> {
-			cells[x][y] = new Cell(this, x, y);
-		});
+	private Stream<Stream<Cell>> rowStream() {
+		return IntStream.range(0, MAX).mapToObj(
+				(y) -> IntStream.range(0, MAX).mapToObj((x) -> cells[x][y]));
 	}
 
-	private void initializeBoxes() {
-		fill(3, 3, (x, y) -> {
-			boxes[x][y] = new Box(this, x, y);
-		});
-	}
-
-	private void fill(int i, int j, BiConsumer<Integer, Integer> consumer) {
-		for (int y = 0; y < i; y++) {
-			for (int x = 0; x < j; x++) {
-				consumer.accept(x, y);
-			}
-		}
+	void checkRules() throws RuleViolation {
+		onlyOneVowelInRowOneColumn();
+		allBoxesAreFilledInOrder();
+		piecesAreInOrder();
 	}
 
 }

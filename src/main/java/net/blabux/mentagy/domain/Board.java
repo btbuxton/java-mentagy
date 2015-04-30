@@ -154,23 +154,26 @@ public class Board {
 	private void piecesAreInOrder() throws RuleViolation {
 		Set<Piece> played = allCells().map(Cell::get)
 				.filter(Piece::isAlphabetical).collect(Collectors.toSet());
-		Set<Cell> badCells = allCells().filter((cell) -> {
-			Piece next = cell.get().next();
-			Piece prev = cell.get().previous();
-			Predicate<Piece> check = (piece) -> {
-				return cell.neighbors().anyMatch((toCheck) -> {
-					return toCheck.get().equals(piece);
-				});
-			};
-			if (next != null && played.contains(next)) {
-				return check.test(next);
-			}
-			if (prev != null && played.contains(prev)) {
-				return check.test(prev);
-			}
-			return false;
-		}).collect(Collectors.toSet());
-		throw new NotConsecutive(badCells);
+		Set<Cell> badCells = allCells().filter(Cell::isAlphabetical)
+				.filter((cell) -> {
+					Piece next = cell.get().next();
+					Piece prev = cell.get().previous();
+					Predicate<Piece> check = (piece) -> {
+						return cell.neighbors().anyMatch((toCheck) -> {
+							return toCheck.get().equals(piece);
+						});
+					};
+					if (next != null && played.contains(next)) {
+						return !check.test(next);
+					}
+					if (prev != null && played.contains(prev)) {
+						return !check.test(prev);
+					}
+					return false;
+				}).collect(Collectors.toSet());
+		if (!badCells.isEmpty()) {
+			throw new NotConsecutive(badCells);
+		}
 	}
 
 	private Stream<Stream<Cell>> rowStream() {

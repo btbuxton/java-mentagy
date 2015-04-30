@@ -57,7 +57,7 @@ public class CellComponent extends JPanel {
 
 	private void centerText(Graphics g, String text) {
 		Graphics2D g2d = (Graphics2D) g;
-		Font biggerFont = g2d.getFont().deriveFont(24.0f).deriveFont(Font.BOLD);
+		Font biggerFont = g2d.getFont().deriveFont(48.0f).deriveFont(Font.BOLD);
 		g2d.setFont(biggerFont);
 		FontMetrics fm = g2d.getFontMetrics();
 		Rectangle2D r = fm.getStringBounds(text, g2d);

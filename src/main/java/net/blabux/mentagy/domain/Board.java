@@ -87,7 +87,6 @@ public class Board {
 	}
 
 	private void allBoxesAreFilledInOrder() throws RuleViolation {
-		// TODO doesn't catch violations early enough
 		Cell current = findMinimumStart();
 		Box currentBox = current.box();
 		while (null != current) {

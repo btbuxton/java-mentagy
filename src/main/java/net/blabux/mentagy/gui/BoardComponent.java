@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
 
 import net.blabux.mentagy.domain.Board;
 
@@ -14,21 +15,14 @@ public class BoardComponent extends JPanel {
 	private static final long serialVersionUID = 6041698819860165194L;
 	JFrame frame;
 	Board board;
-	
+
 	public BoardComponent() {
 		initialize();
 	}
-	
-	public void show() {
-		frame = new JFrame("Mentagy");
-		frame.add(this);
-		frame.setSize(480, 480);
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-	
+
 	private void initialize() {
 		initializeBoard();
+		setBorder(new BevelBorder(BevelBorder.LOWERED));
 		setLayout(new GridLayout(3, 3, 2, 2));
 		IntStream.range(0, 3).forEach((y) -> {
 			IntStream.range(0, 3).forEach((x) -> {

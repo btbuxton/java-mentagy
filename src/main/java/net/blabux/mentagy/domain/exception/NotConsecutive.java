@@ -1,16 +1,17 @@
 package net.blabux.mentagy.domain.exception;
 
+import java.util.Collection;
+import java.util.Set;
+
 import net.blabux.mentagy.domain.Cell;
 
 public class NotConsecutive extends RuleViolation {
-	final Cell previous;
-	final Cell next;
-	
-	public NotConsecutive(Cell current, Cell next) {
-		this.previous = current;
-		this.next = next;
-	}
-
 	private static final long serialVersionUID = -9111413557808763042L;
+
+	final Collection<Cell> violations;
+
+	public NotConsecutive(Set<Cell> badCells) {
+		violations = badCells;
+	}
 
 }

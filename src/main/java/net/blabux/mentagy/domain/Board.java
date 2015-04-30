@@ -3,12 +3,18 @@ package net.blabux.mentagy.domain;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import net.blabux.mentagy.domain.exception.BoardParseException;
 import net.blabux.mentagy.domain.exception.BoxNotFilled;
+import net.blabux.mentagy.domain.exception.MoreThanOneVowel;
 import net.blabux.mentagy.domain.exception.NotConsecutive;
 import net.blabux.mentagy.domain.exception.RuleViolation;
 
@@ -130,43 +136,41 @@ public class Board {
 	}
 
 	private void onlyOneVowelInRowOneColumn() throws RuleViolation {
-		/*
-		 * List<Cell> badCells = allCells().filter((cell) -> { Piece next =
-		 * cell.get().next(); Piece prev = cell.get().previous(); // check each
-		 * piece against Predicate<Piece> check = (piece) -> { return
-		 * cell.neighbors().anyMatch((toCheck) -> { return
-		 * toCheck.get().equals(piece); }); }; if (next != null) {
-		 * 
-		 * } if (prev != null) {
-		 * 
-		 * } }).collect(Collectors.toList());
-		 */
-		/*
-		 * Function<Stream<Stream<Cell>>, Stream<List<Cell>>> findVowels =
-		 * (stream) -> { return stream .map((row) ->
-		 * row.filter(Cell::isVowel).collect(
-		 * Collectors.toList())).collect(Collectors.toList())
-		 * .stream().filter((list) -> list.size() > 1); }; Stream<List<Cell>>
-		 * badRows = findVowels.apply(rowStream()); Stream<List<Cell>>
-		 * badColumns = findVowels.apply(columnStream()); List<List<Cell>>
-		 * violations = Stream.concat(badRows, badColumns)
-		 * .collect(Collectors.toList()); if (violations.size() > 0) { throw new
-		 * MoreThanOneVowel(violations); }
-		 */
+		Function<Stream<Stream<Cell>>, Stream<List<Cell>>> findVowels = (stream) -> {
+			return stream
+					.map((row) -> row.filter(Cell::isVowel).collect(
+							Collectors.toList())).collect(Collectors.toList())
+							.stream().filter((list) -> list.size() > 1);
+		};
+		Stream<List<Cell>> badRows = findVowels.apply(rowStream());
+		Stream<List<Cell>> badColumns = findVowels.apply(columnStream());
+		List<List<Cell>> violations = Stream.concat(badRows, badColumns)
+				.collect(Collectors.toList());
+		if (violations.size() > 0) {
+			throw new MoreThanOneVowel(violations);
+		}
 	}
 
 	private void piecesAreInOrder() throws RuleViolation {
-		// TODO fix
-		Cell current = findMinimumStart();
-		while (null != current) {
-			Cell next = current.next();
-			if (null == next)
-				break;
-			if (current.neighbors().noneMatch((cell) -> cell.equals(next))) {
-				throw new NotConsecutive(current, next);
+		Set<Piece> played = allCells().map(Cell::get)
+				.filter(Piece::isAlphabetical).collect(Collectors.toSet());
+		Set<Cell> badCells = allCells().filter((cell) -> {
+			Piece next = cell.get().next();
+			Piece prev = cell.get().previous();
+			Predicate<Piece> check = (piece) -> {
+				return cell.neighbors().anyMatch((toCheck) -> {
+					return toCheck.get().equals(piece);
+				});
+			};
+			if (next != null && played.contains(next)) {
+				return check.test(next);
 			}
-			current = next;
-		}
+			if (prev != null && played.contains(prev)) {
+				return check.test(prev);
+			}
+			return false;
+		}).collect(Collectors.toSet());
+		throw new NotConsecutive(badCells);
 	}
 
 	private Stream<Stream<Cell>> rowStream() {

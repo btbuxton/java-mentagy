@@ -13,9 +13,6 @@ public class Piece implements Comparable<Piece> {
 	public final static Piece PEG = new Piece(PEG_CHAR);
 	public final static List<Piece> ALL;
 
-	final char value;
-	Piece next;
-
 	static {
 		List<Piece> temp = new ArrayList<Piece>();
 		for (char c = 'a'; c <= 'z'; c++) {
@@ -23,7 +20,6 @@ public class Piece implements Comparable<Piece> {
 		}
 		ALL = Collections.unmodifiableList(temp);
 	}
-
 	public static Piece parse(char value) {
 		if (BLANK_CHAR == value) {
 			return BLANK;
@@ -38,25 +34,12 @@ public class Piece implements Comparable<Piece> {
 		throw new PieceParseException(value);
 	}
 
+	final char value;
+
+	Piece next;
+
 	private Piece(char value) {
 		this.value = value;
-	}
-
-	public boolean isBlank() {
-		return this == BLANK;
-	}
-
-	public boolean isPeg() {
-		return this == PEG;
-	}
-
-	public boolean isVowel() {
-		return value == 'a' || value == 'e' || value == 'i' || value == 'o'
-				|| value == 'u' || value == 'y';
-	}
-
-	public String value() {
-		return new String(new char[] { value });
 	}
 
 	@Override
@@ -94,8 +77,26 @@ public class Piece implements Comparable<Piece> {
 		return value == another.value;
 	}
 
+	@Override
+	public int hashCode() {
+		return value;
+	}
+
 	public boolean isAlphabetical() {
 		return !(isBlank() || isPeg());
+	}
+
+	public boolean isBlank() {
+		return this == BLANK;
+	}
+
+	public boolean isPeg() {
+		return this == PEG;
+	}
+
+	public boolean isVowel() {
+		return value == 'a' || value == 'e' || value == 'i' || value == 'o'
+				|| value == 'u' || value == 'y';
 	}
 
 	public Piece next() {
@@ -110,5 +111,9 @@ public class Piece implements Comparable<Piece> {
 			return null;
 		}
 		return ALL.get(value - 'a' - 1);
+	}
+
+	public String value() {
+		return new String(new char[] { value });
 	}
 }

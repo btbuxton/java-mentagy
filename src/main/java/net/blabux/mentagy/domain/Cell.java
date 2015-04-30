@@ -101,6 +101,7 @@ public class Cell implements Comparable<Cell> {
 		return piece.value();
 	}
 
+	@Override
 	public String toString() {
 		return new StringBuilder().append(x).append('@').append(y).append('=')
 				.append(value()).toString();
@@ -116,6 +117,11 @@ public class Cell implements Comparable<Cell> {
 
 	public void checkRules() throws RuleViolation {
 		board.checkRules();
+	}
+
+	@Override
+	public int hashCode() {
+		return piece.hashCode();
 	}
 
 }

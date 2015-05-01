@@ -1,13 +1,17 @@
 package net.blabux.mentagy.gui;
 
 import java.awt.BorderLayout;
+import java.util.Iterator;
 import java.util.stream.IntStream;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+
+import net.blabux.mentagy.domain.Piece;
 
 public class GameComponent extends JPanel {
 	private static final long serialVersionUID = 7786205238285692620L;
@@ -17,69 +21,74 @@ public class GameComponent extends JPanel {
 		initialize();
 	}
 
-	private JComponent createBottomPanel() {
+	private JComponent createBottomPanel(Iterator<Piece> pieces) {
 		JPanel result = new JPanel();
-		result.setBorder(new EmptyBorder(5,5,5,5));
-		result.setLayout(new BoxLayout(result,BoxLayout.X_AXIS));
+		result.setBorder(createPanelBorder());
+		result.setLayout(new BoxLayout(result, BoxLayout.X_AXIS));
 
 		IntStream.range(0, 10).forEach((index) -> {
 			result.add(Box.createHorizontalGlue());
-			result.add(createFreePiece());
+			result.add(createFreePiece(pieces));
 		});
-		result.add(Box.createHorizontalGlue());
+		result.remove(0);
 		return result;
 	}
 
-	private JComponent createFreePiece() {
-		return new PieceComponent();
+	private JComponent createFreePiece(Iterator<Piece> pieces) {
+		return new PieceComponent(pieces.next());
 	}
 
-	private JComponent createLeftPanel() {
+	private JComponent createLeftPanel(Iterator<Piece> pieces) {
 		JPanel result = new JPanel();
-		result.setBorder(new EmptyBorder(5,5,5,5));
-		result.setLayout(new BoxLayout(result,BoxLayout.Y_AXIS));
+		result.setBorder(createPanelBorder());
+		result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
 
-		IntStream.range(0, 10).forEach((index) -> {
+		IntStream.range(0, 8).forEach((index) -> {
+			result.add(Box.createVerticalGlue(), 0);
+			result.add(createFreePiece(pieces), 0);
+		});
+		result.remove(result.getComponentCount() - 1);
+		return result;
+	}
+
+	private Border createPanelBorder() {
+		return new EmptyBorder(5, 5, 5, 5);
+	}
+
+	private JComponent createRightPanel(Iterator<Piece> pieces) {
+		JPanel result = new JPanel();
+		result.setBorder(createPanelBorder());
+		result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
+
+		IntStream.range(0, 8).forEach((index) -> {
 			result.add(Box.createVerticalGlue());
-			result.add(createFreePiece());
+			result.add(createFreePiece(pieces));
 		});
-		result.add(Box.createVerticalGlue());
+		result.remove(0);
 		return result;
 	}
 
-	private JComponent createRightPanel() {
+	private JComponent createTopPanel(Iterator<Piece> pieces) {
 		JPanel result = new JPanel();
-		result.setBorder(new EmptyBorder(5,5,5,5));
-		result.setLayout(new BoxLayout(result,BoxLayout.Y_AXIS));
-
-		IntStream.range(0, 10).forEach((index) -> {
-			result.add(Box.createVerticalGlue());
-			result.add(createFreePiece());
-		});
-		result.add(Box.createVerticalGlue());
-		return result;
-	}
-
-	private JComponent createTopPanel() {
-		JPanel result = new JPanel();
-		result.setBorder(new EmptyBorder(5,5,5,5));
-		result.setLayout(new BoxLayout(result,BoxLayout.X_AXIS));
+		result.setBorder(createPanelBorder());
+		result.setLayout(new BoxLayout(result, BoxLayout.X_AXIS));
 
 		IntStream.range(0, 10).forEach((index) -> {
 			result.add(Box.createHorizontalGlue());
-			result.add(createFreePiece());
+			result.add(createFreePiece(pieces));
 		});
-		result.add(Box.createHorizontalGlue());
+		result.remove(0);
 		return result;
 	}
 
 	private void initialize() {
 		board = new BoardComponent();
 		setLayout(new BorderLayout(2, 2));
+		Iterator<Piece> pieces = Piece.ALL.iterator();
 		add(board, BorderLayout.CENTER);
-		add(createLeftPanel(), BorderLayout.WEST);
-		add(createRightPanel(), BorderLayout.EAST);
-		add(createTopPanel(), BorderLayout.NORTH);
-		add(createBottomPanel(), BorderLayout.SOUTH);
+		add(createLeftPanel(pieces), BorderLayout.WEST);
+		add(createTopPanel(pieces), BorderLayout.NORTH);
+		add(createRightPanel(pieces), BorderLayout.EAST);
+		add(createBottomPanel(pieces), BorderLayout.SOUTH);
 	}
 }

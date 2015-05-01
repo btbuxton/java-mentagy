@@ -10,7 +10,16 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
 
+import net.blabux.mentagy.domain.Piece;
+
 public class PieceComponent extends JComponent {
+	private static final long serialVersionUID = -5251681235742245097L;
+	private Piece piece;
+
+	public PieceComponent(Piece piece) {
+		this.piece = piece;
+	}
+
 	@Override
 	public void addNotify() {
 		super.addNotify();
@@ -42,10 +51,14 @@ public class PieceComponent extends JComponent {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Rectangle bounds = g.getClipBounds();
-		g.setColor(Color.WHITE);
+		if (piece.isPeg()) {
+			g.setColor(Color.BLACK);
+		} else {
+			g.setColor(Color.WHITE);
+		}
 		g.fillOval(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
 		g.setColor(Color.BLACK);
 		g.drawOval(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
-		centerText(g, bounds, "a");
+		centerText(g, bounds, piece.value());
 	}
 }

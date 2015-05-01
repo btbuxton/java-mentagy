@@ -9,17 +9,24 @@ import net.blabux.mentagy.domain.exception.PieceParseException;
 public class Piece implements Comparable<Piece> {
 	private static final char PEG_CHAR = '*';
 	private static final char BLANK_CHAR = '-';
+	private final static List<Piece> ALL_ALPHA;
 	public final static Piece BLANK = new Piece(BLANK_CHAR);
 	public final static Piece PEG = new Piece(PEG_CHAR);
 	public final static List<Piece> ALL;
 
 	static {
-		List<Piece> temp = new ArrayList<Piece>();
+		List<Piece> alphas = new ArrayList<Piece>();
 		for (char c = 'a'; c <= 'z'; c++) {
-			temp.add(new Piece(c));
+			alphas.add(new Piece(c));
 		}
-		ALL = Collections.unmodifiableList(temp);
+		ALL_ALPHA = Collections.unmodifiableList(alphas);
+		List<Piece> all = new ArrayList<Piece>(alphas);
+		for (int i = 0; i < 10; i++) {
+			all.add(Piece.PEG);
+		}
+		ALL = Collections.unmodifiableList(all);
 	}
+
 	public static Piece parse(char value) {
 		if (BLANK_CHAR == value) {
 			return BLANK;
@@ -29,7 +36,7 @@ public class Piece implements Comparable<Piece> {
 		}
 		value = Character.toLowerCase(value);
 		if ('a' <= value && 'z' >= value) {
-			return ALL.get(value - 'a');
+			return ALL_ALPHA.get(value - 'a');
 		}
 		throw new PieceParseException(value);
 	}
@@ -103,14 +110,14 @@ public class Piece implements Comparable<Piece> {
 		if (value == 'z') {
 			return null;
 		}
-		return ALL.get(value - 'a' + 1);
+		return ALL_ALPHA.get(value - 'a' + 1);
 	}
 
 	public Piece previous() {
 		if ('a' == value) {
 			return null;
 		}
-		return ALL.get(value - 'a' - 1);
+		return ALL_ALPHA.get(value - 'a' - 1);
 	}
 
 	public String value() {

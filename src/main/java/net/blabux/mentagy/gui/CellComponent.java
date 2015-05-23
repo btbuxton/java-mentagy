@@ -5,6 +5,11 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -12,6 +17,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.border.LineBorder;
@@ -144,12 +150,43 @@ public class CellComponent extends JComponent {
 					cell.checkRules();
 				} catch (RuleViolation ex) {
 					cell.set(previous);
-					ex.printStackTrace(); // TODO...more here
+					//ex.printStackTrace(); // TODO...more here
 				}
 				repaint();
 			}
 
 		});
+		initializeDragTarget();
+	}
+
+	private void initializeDragTarget() {
+		new DropTarget(this, new DropTargetAdapter() {
+			@Override
+			public void drop(DropTargetDropEvent dtde) {
+				if (!cell.isBlank()) {
+					dtde.rejectDrop();
+					return;
+				}
+				dtde.acceptDrop(DnDConstants.ACTION_MOVE);
+
+				try {
+					Piece piece = (Piece) dtde.getTransferable().getTransferData(PieceTransferable.DATA_FLAVOR);
+					cell.set(piece);
+					try {
+						cell.checkRules();
+					} catch (RuleViolation e) {
+						cell.set(Piece.BLANK);
+					}
+					repaint();
+				} catch (UnsupportedFlavorException e) {
+					dtde.dropComplete(false);
+				} catch (IOException e) {
+					dtde.dropComplete(false);
+				}
+				dtde.dropComplete(true);
+			}
+		});
+
 	}
 
 }

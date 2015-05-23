@@ -1,11 +1,23 @@
 package net.blabux.mentagy.gui;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceListener;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
@@ -13,17 +25,19 @@ import javax.swing.JComponent;
 import net.blabux.mentagy.domain.Piece;
 
 public class PieceComponent extends JComponent {
+	private static final int SIZE = 32;
 	private static final long serialVersionUID = -5251681235742245097L;
 	private Piece piece;
 
 	public PieceComponent(Piece piece) {
 		this.piece = piece;
+		initialize();
 	}
 
 	@Override
 	public void addNotify() {
 		super.addNotify();
-		int size = 32;
+		int size = SIZE;
 		setInitialSize(size);
 		Font biggerFont = getFont().deriveFont((float) size / 2).deriveFont(
 				Font.BOLD);
@@ -39,6 +53,26 @@ public class PieceComponent extends JComponent {
 				+ fm.getAscent();
 		g.setColor(Color.BLACK);
 		g.drawString(text, x, y);
+	}
+
+	private void initialize() {
+		DragSource ds = new DragSource();
+		DragGestureRecognizer dgr = ds.createDefaultDragGestureRecognizer(this,
+				DnDConstants.ACTION_MOVE, new DragGestureListener() {
+			@Override
+			public void dragGestureRecognized(DragGestureEvent dge) {
+				Image image = createImage(SIZE, SIZE);
+				paint(image.getGraphics());
+				Transferable transferable = new PieceTransferable(piece);
+				DragSourceListener dsl = new DragSourceAdapter() {
+					@Override
+					public void dragDropEnd(DragSourceDropEvent dsde) {
+						System.out.print("end " + dsde);
+					}
+				};
+				ds.startDrag(dge, Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR), image, new Point(0,0), transferable, dsl);
+			}
+		});
 	}
 
 	private void setInitialSize(int size) {

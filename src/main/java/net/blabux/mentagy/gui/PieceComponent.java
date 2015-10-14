@@ -13,7 +13,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDropEvent;
@@ -57,7 +56,7 @@ public class PieceComponent extends JComponent {
 
 	private void initialize() {
 		DragSource ds = new DragSource();
-		DragGestureRecognizer dgr = ds.createDefaultDragGestureRecognizer(this,
+		ds.createDefaultDragGestureRecognizer(this,
 				DnDConstants.ACTION_MOVE, new DragGestureListener() {
 			@Override
 			public void dragGestureRecognized(DragGestureEvent dge) {
@@ -67,7 +66,7 @@ public class PieceComponent extends JComponent {
 				DragSourceListener dsl = new DragSourceAdapter() {
 					@Override
 					public void dragDropEnd(DragSourceDropEvent dsde) {
-						System.out.print("end " + dsde);
+						//TODO do nothing
 					}
 				};
 				ds.startDrag(dge, Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR), image, new Point(0,0), transferable, dsl);

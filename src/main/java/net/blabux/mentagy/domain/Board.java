@@ -44,12 +44,9 @@ public class Board {
 
 	public Stream<Cell> neighbors(int locX, int locY) {
 		// temp is needed to keep compiler happy
-		Stream<Stream<Cell>> temp = IntStream.range(Math.max(0, locX - 1),
-				Math.min(MAX, locX + 2)).mapToObj(
-						(x) -> IntStream
-						.range(Math.max(0, locY - 1), Math.min(MAX, locY + 2))
-						.filter((y) -> !(x == locX && y == locY))
-						.mapToObj((y) -> cells[x][y]));
+		Stream<Stream<Cell>> temp = IntStream.range(Math.max(0, locX - 1), Math.min(MAX, locX + 2))
+				.mapToObj((x) -> IntStream.range(Math.max(0, locY - 1), Math.min(MAX, locY + 2))
+						.filter((y) -> !(x == locX && y == locY)).mapToObj((y) -> cells[x][y]));
 		return temp.reduce(Stream.empty(), Stream::concat);
 	}
 
@@ -118,8 +115,7 @@ public class Board {
 	}
 
 	private Cell findMinimumStart() {
-		return allCells().filter(Cell::isAlphabetical).sorted().findFirst()
-				.get();
+		return allCells().filter(Cell::isAlphabetical).sorted().findFirst().get();
 	}
 
 	private void initializeBoxes() {
@@ -136,54 +132,54 @@ public class Board {
 
 	private void onlyOneVowelInRowOneColumn() throws RuleViolation {
 		Function<Stream<Stream<Cell>>, Stream<List<Cell>>> findVowels = (stream) -> {
-			return stream
-					.map((row) -> row.filter(Cell::isVowel).collect(
-							Collectors.toList())).collect(Collectors.toList())
-							.stream().filter((list) -> list.size() > 1);
+			return stream.map((row) -> row.filter(Cell::isVowel).collect(Collectors.toList()))
+					.collect(Collectors.toList()).stream().filter((list) -> list.size() > 1);
 		};
 		Stream<List<Cell>> badRows = findVowels.apply(rowStream());
 		Stream<List<Cell>> badColumns = findVowels.apply(columnStream());
-		List<List<Cell>> violations = Stream.concat(badRows, badColumns)
-				.collect(Collectors.toList());
+		List<List<Cell>> violations = Stream.concat(badRows, badColumns).collect(Collectors.toList());
 		if (violations.size() > 0) {
 			throw new MoreThanOneVowel(violations);
 		}
 	}
 
 	private void piecesAreInOrder() throws RuleViolation {
-		Set<Piece> played = allCells().map(Cell::get)
-				.filter(Piece::isAlphabetical).collect(Collectors.toSet());
-		Set<Cell> badCells = allCells().filter(Cell::isAlphabetical)
-				.filter((cell) -> {
-					Piece next = cell.get().next();
-					Piece prev = cell.get().previous();
-					Predicate<Piece> check = (piece) -> {
-						return cell.neighbors().anyMatch((toCheck) -> {
-							return toCheck.get().equals(piece);
-						});
-					};
-					if (next != null && played.contains(next)) {
-						return !check.test(next);
-					}
-					if (prev != null && played.contains(prev)) {
-						return !check.test(prev);
-					}
-					return false;
-				}).collect(Collectors.toSet());
+		Set<Piece> played = allCells().map(Cell::get).filter(Piece::isAlphabetical).collect(Collectors.toSet());
+		Set<Cell> badCells = allCells().filter(Cell::isAlphabetical).filter((cell) -> {
+			Piece next = cell.get().next();
+			Piece prev = cell.get().previous();
+			Predicate<Piece> check = (piece) -> {
+				return cell.neighbors().anyMatch((toCheck) -> {
+					return toCheck.get().equals(piece);
+				});
+			};
+			if (next != null && played.contains(next)) {
+				return !check.test(next);
+			}
+			if (prev != null && played.contains(prev)) {
+				return !check.test(prev);
+			}
+			return false;
+		}).collect(Collectors.toSet());
 		if (!badCells.isEmpty()) {
 			throw new NotConsecutive(badCells);
 		}
 	}
 
 	private Stream<Stream<Cell>> rowStream() {
-		return IntStream.range(0, MAX).mapToObj(
-				(y) -> IntStream.range(0, MAX).mapToObj((x) -> cells[x][y]));
+		return IntStream.range(0, MAX).mapToObj((y) -> IntStream.range(0, MAX).mapToObj((x) -> cells[x][y]));
 	}
 
 	void checkRules() throws RuleViolation {
 		onlyOneVowelInRowOneColumn();
 		allBoxesAreFilledInOrder();
 		piecesAreInOrder();
+	}
+
+	boolean isUsed(Piece piece) {
+		return allCells().anyMatch((each) -> {
+			return piece.equals(each.get());
+		});
 	}
 
 }

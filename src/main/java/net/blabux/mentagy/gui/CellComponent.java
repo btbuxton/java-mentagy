@@ -144,13 +144,15 @@ public class CellComponent extends JComponent {
 				if (null == piece) {
 					return;
 				}
+				if (cell.isUsedOnBoard(piece)) {
+					return;
+				}
 				Piece previous = cell.get();
 				cell.set(piece);
 				try {
 					cell.checkRules();
 				} catch (RuleViolation ex) {
 					cell.set(previous);
-					//ex.printStackTrace(); // TODO...more here
 				}
 				repaint();
 			}

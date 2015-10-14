@@ -21,24 +21,66 @@ public class Cell implements Comparable<Cell> {
 		blank();
 	}
 
-	public boolean isBlank() {
-		return piece.isBlank();
-	}
-
 	public void blank() {
 		this.piece = Piece.BLANK;
 	}
 
-	public boolean isVowel() {
-		return piece.isVowel();
+	public Box box() {
+		return board.box(x / 2, y / 2);
+	}
+
+	public void checkRules() throws RuleViolation {
+		board.checkRules();
+	}
+
+	@Override
+	public int compareTo(Cell another) {
+		return piece.compareTo(another.piece);
+	}
+
+	public Piece get() {
+		return piece;
+	}
+
+	@Override
+	public int hashCode() {
+		return piece.hashCode();
 	}
 
 	public boolean isAlphabetical() {
 		return piece.isAlphabetical();
 	}
 
-	public Piece get() {
-		return piece;
+	public boolean isBlank() {
+		return piece.isBlank();
+	}
+
+	public boolean isPeg() {
+		return piece.isPeg();
+	}
+
+	public boolean isUsedOnBoard(Piece piece) {
+		return board.isUsed(piece);
+	}
+
+	public boolean isVowel() {
+		return piece.isVowel();
+	}
+
+	public void lock() {
+		locked = true;
+	}
+
+	public Stream<Cell> neighbors() {
+		return board.neighbors(x, y);
+	}
+
+	public Cell next() {
+		return series(Piece::next);
+	}
+
+	public Cell previous() {
+		return series(Piece::previous);
 	}
 
 	public void set(Piece piece) {
@@ -60,25 +102,14 @@ public class Cell implements Comparable<Cell> {
 		this.piece = piece;
 	}
 
-	public Box box() {
-		return board.box(x / 2, y / 2);
-	}
-
-	public Stream<Cell> neighbors() {
-		return board.neighbors(x, y);
-	}
-
 	@Override
-	public int compareTo(Cell another) {
-		return piece.compareTo(another.piece);
+	public String toString() {
+		return new StringBuilder().append(x).append('@').append(y).append('=')
+				.append(value()).toString();
 	}
 
-	public Cell next() {
-		return series(Piece::next);
-	}
-
-	public Cell previous() {
-		return series(Piece::previous);
+	public String value() {
+		return piece.value();
 	}
 
 	private Cell series(Function<Piece, Piece> nextFunc) {
@@ -95,33 +126,6 @@ public class Cell implements Comparable<Cell> {
 			return optional.get();
 		}
 		return null;
-	}
-
-	public String value() {
-		return piece.value();
-	}
-
-	@Override
-	public String toString() {
-		return new StringBuilder().append(x).append('@').append(y).append('=')
-				.append(value()).toString();
-	}
-
-	public boolean isPeg() {
-		return piece.isPeg();
-	}
-
-	public void lock() {
-		locked = true;
-	}
-
-	public void checkRules() throws RuleViolation {
-		board.checkRules();
-	}
-
-	@Override
-	public int hashCode() {
-		return piece.hashCode();
 	}
 
 }

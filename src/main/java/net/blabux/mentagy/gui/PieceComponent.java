@@ -26,9 +26,13 @@ import net.blabux.mentagy.domain.Piece;
 public class PieceComponent extends JComponent {
 	private static final int SIZE = 32;
 	private static final long serialVersionUID = -5251681235742245097L;
+	private final BoardComponent board;
+	private final Piece original;
 	private Piece piece;
 
-	public PieceComponent(Piece piece) {
+	public PieceComponent(BoardComponent board, Piece piece) {
+		this.board = board;
+		this.original = piece;
 		this.piece = piece;
 		initialize();
 	}
@@ -38,9 +42,15 @@ public class PieceComponent extends JComponent {
 		super.addNotify();
 		int size = SIZE;
 		setInitialSize(size);
-		Font biggerFont = getFont().deriveFont((float) size / 2).deriveFont(
-				Font.BOLD);
+		Font biggerFont = getFont().deriveFont((float) size / 2).deriveFont(Font.BOLD);
 		setFont(biggerFont);
+	}
+
+	public void update() {
+		if (isOnBoard()) {
+			piece = Piece.BLANK;
+		}
+		repaint();
 	}
 
 	// TODO make this unduplicated with CellComponent
@@ -48,30 +58,37 @@ public class PieceComponent extends JComponent {
 		FontMetrics fm = g.getFontMetrics();
 		Rectangle2D r = fm.getStringBounds(text, g);
 		int x = bounds.x + (bounds.width - (int) r.getWidth()) / 2;
-		int y = bounds.y + (bounds.height - (int) r.getHeight()) / 2
-				+ fm.getAscent();
+		int y = bounds.y + (bounds.height - (int) r.getHeight()) / 2 + fm.getAscent();
 		g.setColor(Color.BLACK);
 		g.drawString(text, x, y);
 	}
 
 	private void initialize() {
 		DragSource ds = new DragSource();
-		ds.createDefaultDragGestureRecognizer(this,
-				DnDConstants.ACTION_MOVE, new DragGestureListener() {
+		ds.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_MOVE, new DragGestureListener() {
 			@Override
 			public void dragGestureRecognized(DragGestureEvent dge) {
+				if (isOnBoard()) {
+					return;
+				}
 				Image image = createImage(SIZE, SIZE);
 				paint(image.getGraphics());
 				Transferable transferable = new PieceTransferable(piece);
 				DragSourceListener dsl = new DragSourceAdapter() {
 					@Override
 					public void dragDropEnd(DragSourceDropEvent dsde) {
-						//TODO do nothing
+						piece = Piece.BLANK;
+						repaint();
 					}
 				};
-				ds.startDrag(dge, Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR), image, new Point(0,0), transferable, dsl);
+				ds.startDrag(dge, Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR), image, new Point(0, 0), transferable,
+						dsl);
 			}
 		});
+	}
+
+	private boolean isOnBoard() {
+		return board.getBoard().isUsed(original);
 	}
 
 	private void setInitialSize(int size) {
@@ -92,6 +109,8 @@ public class PieceComponent extends JComponent {
 		g.fillOval(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
 		g.setColor(Color.BLACK);
 		g.drawOval(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
-		centerText(g, bounds, piece.value());
+		if (!piece.isBlank()) {
+			centerText(g, bounds, piece.value());
+		}
 	}
 }

@@ -41,9 +41,7 @@ public class Piece implements Comparable<Piece> {
 		throw new PieceParseException(value);
 	}
 
-	final char value;
-
-	Piece next;
+	private final char value;
 
 	private Piece(char value) {
 		this.value = value;

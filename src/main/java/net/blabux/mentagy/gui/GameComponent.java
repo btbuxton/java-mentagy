@@ -1,7 +1,9 @@
 package net.blabux.mentagy.gui;
 
 import java.awt.BorderLayout;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import javax.swing.Box;
@@ -11,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import net.blabux.mentagy.domain.Board;
 import net.blabux.mentagy.domain.Piece;
 
 public class GameComponent extends JPanel {
@@ -35,7 +38,7 @@ public class GameComponent extends JPanel {
 	}
 
 	private JComponent createFreePiece(Iterator<Piece> pieces) {
-		return new PieceComponent(pieces.next());
+		return new PieceComponent(board, pieces.next());
 	}
 
 	private JComponent createLeftPanel(Iterator<Piece> pieces) {
@@ -82,7 +85,7 @@ public class GameComponent extends JPanel {
 	}
 
 	private void initialize() {
-		board = new BoardComponent();
+		board = new BoardComponent(initializeBoard());
 		setLayout(new BorderLayout(2, 2));
 		Iterator<Piece> pieces = Piece.ALL.iterator();
 		add(board, BorderLayout.CENTER);
@@ -90,5 +93,12 @@ public class GameComponent extends JPanel {
 		add(createTopPanel(pieces), BorderLayout.NORTH);
 		add(createRightPanel(pieces), BorderLayout.EAST);
 		add(createBottomPanel(pieces), BorderLayout.SOUTH);
+	}
+
+	private Board initializeBoard() {
+		Board newBoard = new Board();
+		List<String> boardText=Arrays.asList("-----*","N-*J*-", "T--*--", "-*--*D", "*-Z*A-","---*-*");
+		newBoard.parse(boardText.stream());
+		return newBoard;
 	}
 }

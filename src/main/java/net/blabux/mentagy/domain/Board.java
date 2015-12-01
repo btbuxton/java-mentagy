@@ -42,6 +42,12 @@ public class Board {
 		return cells[x][y];
 	}
 
+	public boolean isUsed(Piece piece) {
+		return allCells().anyMatch((each) -> {
+			return piece.equals(each.get());
+		});
+	}
+
 	public Stream<Cell> neighbors(int locX, int locY) {
 		// temp is needed to keep compiler happy
 		Stream<Stream<Cell>> temp = IntStream.range(Math.max(0, locX - 1), Math.min(MAX, locX + 2))
@@ -174,12 +180,6 @@ public class Board {
 		onlyOneVowelInRowOneColumn();
 		allBoxesAreFilledInOrder();
 		piecesAreInOrder();
-	}
-
-	boolean isUsed(Piece piece) {
-		return allCells().anyMatch((each) -> {
-			return piece.equals(each.get());
-		});
 	}
 
 }

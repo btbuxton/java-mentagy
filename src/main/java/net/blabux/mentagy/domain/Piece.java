@@ -1,18 +1,18 @@
 package net.blabux.mentagy.domain;
 
+import net.blabux.mentagy.domain.exception.PieceParseException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.blabux.mentagy.domain.exception.PieceParseException;
-
 public class Piece implements Comparable<Piece> {
-    private static final char PEG_CHAR = '*';
-    private static final char BLANK_CHAR = '-';
-    private final static List<Piece> ALL_ALPHA;
-    public final static Piece BLANK = new Piece(BLANK_CHAR);
-    public final static Piece PEG = new Piece(PEG_CHAR);
     public final static List<Piece> ALL;
+    private static final char PEG_CHAR = '*';
+    public final static Piece PEG = new Piece(PEG_CHAR);
+    private static final char BLANK_CHAR = '-';
+    public final static Piece BLANK = new Piece(BLANK_CHAR);
+    private final static List<Piece> ALL_ALPHA;
 
     static {
         List<Piece> alphas = new ArrayList<Piece>();
@@ -27,6 +27,12 @@ public class Piece implements Comparable<Piece> {
         ALL = Collections.unmodifiableList(all);
     }
 
+    private final char value;
+
+    private Piece(char value) {
+        this.value = value;
+    }
+
     public static Piece parse(char value) {
         if (BLANK_CHAR == value) {
             return BLANK;
@@ -39,12 +45,6 @@ public class Piece implements Comparable<Piece> {
             return ALL_ALPHA.get(value - 'a');
         }
         throw new PieceParseException(value);
-    }
-
-    private final char value;
-
-    private Piece(char value) {
-        this.value = value;
     }
 
     @Override

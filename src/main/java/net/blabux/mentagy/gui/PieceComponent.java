@@ -1,27 +1,12 @@
 package net.blabux.mentagy.gui;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.geom.Rectangle2D;
-
-import javax.swing.JComponent;
-
 import net.blabux.mentagy.domain.Piece;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.*;
+import java.awt.geom.Rectangle2D;
 
 public class PieceComponent extends JComponent {
     private static final int SIZE = 32;
@@ -77,7 +62,7 @@ public class PieceComponent extends JComponent {
                 DragSourceListener dsl = new DragSourceAdapter() {
                     @Override
                     public void dragDropEnd(DragSourceDropEvent dsde) {
-                        if(dsde.getDropSuccess()){
+                        if (dsde.getDropSuccess()) {
                             piece = Piece.BLANK;
                         }
                         repaint();

@@ -1,33 +1,26 @@
 package net.blabux.mentagy.gui;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import net.blabux.mentagy.domain.Cell;
+import net.blabux.mentagy.domain.Piece;
+import net.blabux.mentagy.domain.exception.PieceParseException;
+import net.blabux.mentagy.domain.exception.RuleViolation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 
-import javax.swing.JComponent;
-import javax.swing.border.LineBorder;
-
-import net.blabux.mentagy.domain.Cell;
-import net.blabux.mentagy.domain.Piece;
-import net.blabux.mentagy.domain.exception.PieceParseException;
-import net.blabux.mentagy.domain.exception.RuleViolation;
-
 public class CellComponent extends JComponent {
+    private static final Logger LOG = LoggerFactory.getLogger(CellComponent.class);
     private static final long serialVersionUID = -1992880940315958022L;
     final Cell cell;
 
@@ -51,10 +44,14 @@ public class CellComponent extends JComponent {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (isFocusOwner()) {
-            g.setColor(Color.BLUE);
-        } else {
+        if (cell.isLocked()) {
             g.setColor(Color.RED);
+        } else {
+            if (isFocusOwner()) {
+                g.setColor(Color.BLUE);
+            } else {
+                g.setColor(Color.BLACK);
+            }
         }
         Rectangle bounds = g.getClipBounds();
         g.drawOval(0, 0, bounds.width, bounds.height);
@@ -133,26 +130,33 @@ public class CellComponent extends JComponent {
             public void keyTyped(KeyEvent e) {
                 Piece piece = null;
                 char key = Character.toLowerCase(e.getKeyChar());
+                if (cell.isLocked()) {
+                    return;
+                }
                 if (' ' == key) {
                     piece = Piece.BLANK;
-                }
-                try {
-                    piece = Piece.parse(key);
-                } catch (PieceParseException ex) {
-                    // IGNORE
+                } else {
+                    try {
+                        piece = Piece.parse(key);
+                    } catch (PieceParseException ex) {
+                        // IGNORE
+                    }
                 }
                 if (null == piece) {
                     return;
                 }
-                if (cell.isUsedOnBoard(piece)) {
+                if (!piece.isBlank() && cell.isUsedOnBoard(piece)) {
                     return;
                 }
                 Piece previous = cell.get();
-                cell.set(piece);
                 try {
+                    cell.set(piece);
                     cell.checkRules();
                 } catch (RuleViolation ex) {
+                    LOG.warn("Rule Failed {}", ex.getMessage());
                     cell.set(previous);
+                } catch (IllegalStateException ex) {
+                    LOG.warn(ex.getMessage());
                 }
                 repaint();
             }
@@ -170,7 +174,7 @@ public class CellComponent extends JComponent {
                     return;
                 }
                 dtde.acceptDrop(DnDConstants.ACTION_MOVE);
-                boolean success = false;
+                boolean success;
                 try {
                     Piece piece = (Piece) dtde.getTransferable().getTransferData(PieceTransferable.DATA_FLAVOR);
                     cell.set(piece);
@@ -183,6 +187,7 @@ public class CellComponent extends JComponent {
                     success = false;
                 } catch (RuleViolation e) {
                     success = false;
+                    LOG.warn("Rule Failed {}", e.getMessage());
                 }
                 if (success) {
                     dtde.dropComplete(true);

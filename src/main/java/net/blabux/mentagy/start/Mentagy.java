@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 import net.blabux.mentagy.gui.GameComponent;
 
 public class Mentagy {
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Mentagy instance = new Mentagy();
 		instance.start();
 	}

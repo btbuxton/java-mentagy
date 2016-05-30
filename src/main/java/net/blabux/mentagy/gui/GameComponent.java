@@ -16,8 +16,8 @@ public class GameComponent extends JPanel {
     private static final long serialVersionUID = 7786205238285692620L;
     private BoardComponent board;
 
-    public GameComponent() {
-        initialize();
+    public GameComponent(Board board) {
+        initialize(board);
     }
 
     private JComponent createBottomPanel(Iterator<Piece> pieces) {
@@ -80,8 +80,8 @@ public class GameComponent extends JPanel {
         return result;
     }
 
-    private void initialize() {
-        board = new BoardComponent(initializeBoard());
+    private void initialize(Board initialBoard) {
+        board = new BoardComponent(initialBoard);
         setLayout(new BorderLayout(2, 2));
         Iterator<Piece> pieces = Piece.ALL.iterator();
         add(board, BorderLayout.CENTER);
@@ -91,10 +91,4 @@ public class GameComponent extends JPanel {
         add(createBottomPanel(pieces), BorderLayout.SOUTH);
     }
 
-    private Board initializeBoard() {
-        Board newBoard = new Board();
-        List<String> boardText = Arrays.asList("-----*", "N-*J*-", "T--*--", "-*--*D", "*-Z*A-", "---*-*");
-        newBoard.parse(boardText.stream());
-        return newBoard;
-    }
 }

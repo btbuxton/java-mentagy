@@ -2,6 +2,7 @@ package net.blabux.mentagy.domain;
 
 import net.blabux.mentagy.domain.exception.RuleViolation;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -103,7 +104,9 @@ public class Cell implements Comparable<Cell> {
         if (locked) {
             throw new IllegalStateException("Cell is locked");
         }
+        Piece oldPiece = this.piece;
         this.piece = piece;
+        board.pieceMoved(oldPiece, this.piece);
     }
 
     @Override

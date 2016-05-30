@@ -18,6 +18,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class CellComponent extends JComponent {
     private static final Logger LOG = LoggerFactory.getLogger(CellComponent.class);
@@ -44,6 +45,7 @@ public class CellComponent extends JComponent {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Rectangle bounds = g.getClipBounds();
         if (cell.isLocked()) {
             g.setColor(Color.RED);
         } else {
@@ -53,15 +55,43 @@ public class CellComponent extends JComponent {
                 g.setColor(Color.BLACK);
             }
         }
-        Rectangle bounds = g.getClipBounds();
         g.drawOval(0, 0, bounds.width, bounds.height);
-        g.setColor(Color.BLACK);
+        g.setColor(getForeground());
         if (cell.isAlphabetical()) {
             String value = cell.value();
             centerText(g, value);
         } else if (cell.isPeg()) {
             g.fillOval(10, 10, bounds.width - 20, bounds.height - 20);
+        } else if (cell.isBlank()) {
+            g.setColor(getBackground());
+            g.fillOval(2, 2, bounds.width - 4, bounds.height - 4);
         }
+    }
+
+    private void flash() {
+        Color bg = getBackground();
+        Color inverseBG = new Color(Color.WHITE.getRGB() ^ bg.getRGB());
+        setBackground(inverseBG);
+        Color fg = getForeground();
+        Color inverseFG = new Color(Color.WHITE.getRGB() ^ fg.getRGB());
+        setForeground(inverseFG);
+        repaint();
+        try {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(200);
+                } catch (InterruptedException ex) {
+                    //ignore
+                } finally {
+                    setBackground(bg);
+                    setForeground(fg);
+                }
+                repaint();
+            });
+        } catch(Exception ex) {
+            LOG.warn("Flash failed", ex);
+        }
+
     }
 
     private void centerText(Graphics g, String text) {
@@ -73,6 +103,8 @@ public class CellComponent extends JComponent {
     }
 
     private void initialize() {
+        setOpaque(true);
+        setForeground(Color.BLACK);
         setEnabled(true);
         setFocusable(true);
         setBorder(new LineBorder(Color.BLACK, 1));
@@ -128,24 +160,18 @@ public class CellComponent extends JComponent {
 
             @Override
             public void keyTyped(KeyEvent e) {
-                Piece piece = null;
                 char key = Character.toLowerCase(e.getKeyChar());
                 if (cell.isLocked()) {
+                    flash();
                     return;
                 }
-                if (' ' == key) {
-                    piece = Piece.BLANK;
-                } else {
-                    try {
-                        piece = Piece.parse(key);
-                    } catch (PieceParseException ex) {
-                        // IGNORE
-                    }
-                }
+                Piece piece = getPiece(key);
                 if (null == piece) {
+                    flash();
                     return;
                 }
                 if (!piece.isBlank() && cell.isUsedOnBoard(piece)) {
+                    flash();
                     return;
                 }
                 Piece previous = cell.get();
@@ -155,10 +181,27 @@ public class CellComponent extends JComponent {
                 } catch (RuleViolation ex) {
                     LOG.warn("Rule Failed {}", ex.getMessage());
                     cell.set(previous);
+                    flash();
                 } catch (IllegalStateException ex) {
                     LOG.warn(ex.getMessage());
+                    cell.set(previous);
+                    flash();
                 }
                 repaint();
+            }
+
+            private Piece getPiece(char key) {
+                Piece piece = null;
+                if (' ' == key) {
+                    piece = Piece.BLANK;
+                } else {
+                    try {
+                        piece = Piece.parse(key);
+                    } catch (PieceParseException ex) {
+                        // IGNORE
+                    }
+                }
+                return piece;
             }
 
         });

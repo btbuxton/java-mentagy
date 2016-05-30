@@ -121,4 +121,5 @@ public class Piece implements Comparable<Piece> {
     public String value() {
         return new String(new char[]{value});
     }
+    
 }

@@ -2,6 +2,8 @@ package net.blabux.mentagy.domain;
 
 import net.blabux.mentagy.domain.exception.*;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -15,11 +17,14 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Board {
+    private static final String PIECE_MOVED_PROPERTY = "pieceMoved";
     private static final int MAX = 6;
     final Cell[][] cells;
     final Box[][] boxes;
+    final PropertyChangeSupport propertyChangeSupport;
 
     public Board() {
+        propertyChangeSupport = new PropertyChangeSupport(this);
         cells = new Cell[MAX][MAX];
         initializeCells();
         boxes = new Box[3][3];
@@ -83,6 +88,14 @@ public class Board {
     public void put(int x, int y, Piece piece) throws RuleViolation {
         cell(x, y).set(piece);
         checkRules();
+    }
+
+    public void addPieceMovedListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(PIECE_MOVED_PROPERTY, listener);
+    }
+
+    public void removePieceMovedListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(PIECE_MOVED_PROPERTY, listener);
     }
 
     private void allBoxesAreFilledInOrder() throws RuleViolation {
@@ -176,6 +189,10 @@ public class Board {
         onlyOneVowelInRowOneColumn();
         allBoxesAreFilledInOrder();
         piecesAreInOrder();
+    }
+
+    void pieceMoved(Piece oldPiece, Piece newPiece) {
+        propertyChangeSupport.firePropertyChange(PIECE_MOVED_PROPERTY, oldPiece, newPiece);
     }
 
 }

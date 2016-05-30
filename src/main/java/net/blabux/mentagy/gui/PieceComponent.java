@@ -31,13 +31,6 @@ public class PieceComponent extends JComponent {
         setFont(biggerFont);
     }
 
-    public void update() {
-        if (isOnBoard()) {
-            piece = Piece.BLANK;
-        }
-        repaint();
-    }
-
     // TODO make this unduplicated with CellComponent
     private void centerText(Graphics g, Rectangle bounds, String text) {
         FontMetrics fm = g.getFontMetrics();
@@ -62,14 +55,16 @@ public class PieceComponent extends JComponent {
                 DragSourceListener dsl = new DragSourceAdapter() {
                     @Override
                     public void dragDropEnd(DragSourceDropEvent dsde) {
-                        if (dsde.getDropSuccess()) {
-                            piece = Piece.BLANK;
-                        }
                         repaint();
                     }
                 };
                 ds.startDrag(dge, Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR), image, new Point(0, 0), transferable,
                         dsl);
+            }
+        });
+        board.getBoard().addPieceMovedListener((event) -> {
+            if (piece == event.getOldValue() || piece == event.getNewValue()) {
+                repaint();
             }
         });
     }
@@ -96,7 +91,7 @@ public class PieceComponent extends JComponent {
         g.fillOval(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
         g.setColor(Color.BLACK);
         g.drawOval(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
-        if (!piece.isBlank()) {
+        if (!(piece.isBlank() || isOnBoard())) {
             centerText(g, bounds, piece.value());
         }
     }

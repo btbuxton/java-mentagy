@@ -77,6 +77,8 @@ public class Board {
                     cell(x, y).set(piece);
                     if (piece.isPeg() || piece.isAlphabetical()) {
                         cell(x, y).lock();
+                    } else {
+                        cell(x, y).unlock();
                     }
                 } catch (Exception ex) {
                     throw new BoardParseException(ex);

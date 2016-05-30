@@ -76,6 +76,10 @@ public class Cell implements Comparable<Cell> {
         locked = true;
     }
 
+    public void unlock() {
+        locked = false;
+    }
+
     public Stream<Cell> neighbors() {
         return board.neighbors(x, y);
     }
@@ -134,5 +138,6 @@ public class Cell implements Comparable<Cell> {
         }
         return null;
     }
+
 
 }

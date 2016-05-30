@@ -77,7 +77,7 @@ public class CellComponent extends JComponent {
         setForeground(inverseFG);
         repaint();
         try {
-            SwingUtilities.invokeLater(() -> {
+            EventQueue.invokeLater(() -> {
                 try {
                     TimeUnit.MILLISECONDS.sleep(200);
                 } catch (InterruptedException ex) {

@@ -108,6 +108,10 @@ public class Cell implements Comparable<Cell> {
         if (locked) {
             throw new IllegalStateException("Cell is locked");
         }
+        forceSet(piece);
+    }
+
+    void forceSet(Piece piece) {
         Piece oldPiece = this.piece;
         this.piece = piece;
         board.pieceMoved(oldPiece, this.piece);

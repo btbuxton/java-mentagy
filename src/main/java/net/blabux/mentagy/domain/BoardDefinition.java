@@ -22,16 +22,17 @@ public class BoardDefinition {
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int column = 0; column < BOARD_SIZE; column++) {
                 Cell cell = board.cell(column, row);
+                cell.unlock();
                 PieceDefinition pieceDef = pieces[row][column];
                 if (PieceDefinition.BLANK == pieceDef) {
-                    cell.set(Piece.BLANK);
-                    cell.unlock();
+                    cell.forceSet(Piece.BLANK);
                 } else if (PieceDefinition.PEG == pieceDef) {
-                    cell.set(Piece.PEG);
                     cell.lock();
+                    cell.forceSet(Piece.PEG);
                 } else {
-                    cell.set(Piece.parse(pieceDef.getCharacter()));
                     cell.lock();
+                    cell.forceSet(Piece.parse(pieceDef.getCharacter()));
+
                 }
             }
         }

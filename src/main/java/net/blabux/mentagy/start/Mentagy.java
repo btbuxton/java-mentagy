@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,24 +89,33 @@ public class Mentagy {
         for (String each : levels) {
             JMenu levelMenu = new JMenu(each);
             menu.add(levelMenu);
-            //do something else here
-            JMenuItem item = new JMenuItem("1");
-            levelMenu.add(item);
-            item.addActionListener((event) -> {
-                BoardDefinition def = loadDef(each, "1");
-                if (null != def) {
-                    currentDef = def;
-                }
-                refresh(board);
-            });
+            int index = 1;
+            while (hasDef(each, String.valueOf(index))) {
+                final String indexString = String.valueOf(index);
+                JMenuItem item = new JMenuItem(indexString);
+                levelMenu.add(item);
+                item.addActionListener((event) -> {
+                    BoardDefinition def = loadDef(each, indexString);
+                    if (null != def) {
+                        currentDef = def;
+                    }
+                    refresh(board);
+                });
+                index++;
+            }
         }
+    }
+
+    private boolean hasDef(String level, String number) {
+        URL url = getDefResource(level, number);
+        return null != url;
     }
 
     private BoardDefinition loadDef(String level, String number) {
         BoardDefinitionLoader loader = new SimpleBoardDefinitionLoader();
         BoardDefinition def = null;
         try {
-            InputStream stream = getClass().getResourceAsStream("/puzzles/" + level + "/" + number + ".txt");
+            InputStream stream = getDefResource(level, number).openStream();
             try {
                 InputStreamReader reader = new InputStreamReader(stream);
                 def = loader.load(reader);
@@ -116,6 +126,10 @@ public class Mentagy {
             LOG.warn("Loading failed", ex);
         }
         return def;
+    }
+
+    private URL getDefResource(String level, String number) {
+        return getClass().getResource("/puzzles/" + level + "/" + number + ".txt");
     }
 
     private void refresh(Board board) {

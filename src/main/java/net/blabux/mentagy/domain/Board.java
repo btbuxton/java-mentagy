@@ -74,12 +74,12 @@ public class Board {
             IntStream.range(0, MAX).forEachOrdered((x) -> {
                 try {
                     Piece piece = Piece.parse((char) reader.read());
-                    cell(x, y).set(piece);
                     if (piece.isPeg() || piece.isAlphabetical()) {
                         cell(x, y).lock();
                     } else {
                         cell(x, y).unlock();
                     }
+                    cell(x, y).forceSet(piece);
                 } catch (Exception ex) {
                     throw new BoardParseException(ex);
                 }

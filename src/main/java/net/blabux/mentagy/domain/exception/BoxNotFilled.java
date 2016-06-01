@@ -15,4 +15,8 @@ public class BoxNotFilled extends RuleViolation {
         return box;
     }
 
+    public String getMessage() {
+        return "Box Not Filled";
+    }
+
 }

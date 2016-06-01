@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class Mentagy {
     private static final Logger LOG = LoggerFactory.getLogger(Mentagy.class);
     private BoardDefinition currentDef;
     private JFrame frame;
+    private JLabel statusPanel;
 
     public static void main(final String[] args) {
         Mentagy instance = new Mentagy();
@@ -30,9 +32,18 @@ public class Mentagy {
 
     private void start() {
         frame = new JFrame("Mentagy");
+        frame.setLayout(new BorderLayout());
         final Board board = initialBoard();
-        frame.add(new GameComponent(board));
-        frame.setSize(480, 480);
+        GameComponent gameComp = new GameComponent(board);
+        frame.add(gameComp, BorderLayout.CENTER);
+        JLabel label = new JLabel("Welcome to Mentagy!");
+        label.setBorder(BorderFactory.createLoweredBevelBorder());
+        frame.add(label, BorderLayout.PAGE_END);
+        statusPanel = label;
+        gameComp.addPropertyChangeListener(GameComponent.RULE_FAILED_PROPERTY, (event) -> {
+            statusPanel.setText(String.valueOf(event.getNewValue()));
+        });
+        frame.setSize(480, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         createMenuBar(board);
         frame.setVisible(true);
@@ -124,6 +135,7 @@ public class Mentagy {
             }
         } catch (IOException ex) {
             LOG.warn("Loading failed", ex);
+            statusPanel.setText("Failed loading: " + level + ":" + number);
         }
         return def;
     }

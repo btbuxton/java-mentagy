@@ -13,11 +13,16 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class GameComponent extends JPanel {
+    public static final String RULE_FAILED_PROPERTY = "ruleFailed";
     private static final long serialVersionUID = 7786205238285692620L;
     private BoardComponent board;
 
     public GameComponent(Board board) {
         initialize(board);
+    }
+
+    public void ruleFailed(String ruleMessage) {
+        firePropertyChange(RULE_FAILED_PROPERTY, null, ruleMessage);
     }
 
     private JComponent createBottomPanel(Iterator<Piece> pieces) {

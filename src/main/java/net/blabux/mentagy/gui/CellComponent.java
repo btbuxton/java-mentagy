@@ -20,6 +20,8 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static net.blabux.mentagy.gui.GameComponent.RULE_FAILED_PROPERTY;
+
 public class CellComponent extends JComponent {
     private static final Logger LOG = LoggerFactory.getLogger(CellComponent.class);
     private static final long serialVersionUID = -1992880940315958022L;
@@ -117,26 +119,21 @@ public class CellComponent extends JComponent {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
             }
         });
         addFocusListener(new FocusListener() {
-
             @Override
             public void focusGained(FocusEvent e) {
                 repaint();
@@ -146,10 +143,8 @@ public class CellComponent extends JComponent {
             public void focusLost(FocusEvent e) {
                 repaint();
             }
-
         });
         addKeyListener(new KeyListener() {
-
             @Override
             public void keyPressed(KeyEvent e) {
             }
@@ -180,6 +175,7 @@ public class CellComponent extends JComponent {
                     cell.checkRules();
                 } catch (RuleViolation ex) {
                     LOG.warn("Rule Failed {}", ex.getMessage());
+                    getGameComponent().ruleFailed(ex.getMessage());
                     cell.set(previous);
                     flash();
                 } catch (IllegalStateException ex) {
@@ -206,6 +202,16 @@ public class CellComponent extends JComponent {
 
         });
         initializeDragTarget();
+    }
+
+    private GameComponent getGameComponent() {
+        Container current = this;
+        while (null != (current = current.getParent())) {
+            if (current instanceof GameComponent) {
+                return (GameComponent) current;
+            }
+        }
+        return null;
     }
 
     private void initializeDragTarget() {

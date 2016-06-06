@@ -63,7 +63,36 @@ public class Mentagy {
         menuBar.add(gameMenu);
         JMenu puzzleMenu = createPuzzleMenu(board);
         menuBar.add(puzzleMenu);
+        menuBar.add(Box.createHorizontalGlue());
+        JMenuItem helpMenu = createHelpMenu();
+        menuBar.add(helpMenu);
         frame.setJMenuBar(menuBar);
+    }
+
+    private JMenu createHelpMenu() {
+        JMenu menu = new JMenu("Help");
+        menu.setMnemonic(KeyEvent.VK_H);
+        JMenuItem about = new JMenuItem("About");
+        about.setMnemonic(KeyEvent.VK_A);
+        menu.add(about);
+        about.addActionListener((event) -> {
+            JOptionPane.showMessageDialog(frame, createAboutMessage(), "About", JOptionPane.INFORMATION_MESSAGE);
+        });
+        JMenuItem instructions = new JMenuItem("Instructions");
+        menu.add(instructions);
+        instructions.setMnemonic(KeyEvent.VK_I);
+        instructions.addActionListener((event) -> {
+            JOptionPane.showMessageDialog(frame, createInstructionsDialog(), "Instructions", JOptionPane.INFORMATION_MESSAGE);
+        });
+        return menu;
+    }
+
+    private String createInstructionsDialog() {
+        return "Drag outside piece to board or click an empty space and type the letter.\nGo to http://www.mentagy.com for rules";
+    }
+
+    private String createAboutMessage() {
+        return "Made with love by Blaine Buxton\nhttps://github.com/btbuxton/java-mentagy";
     }
 
     private JMenu createGameMenu(Board board) {

@@ -1,26 +1,37 @@
 package net.blabux.mentagy.gui;
 
-import net.blabux.mentagy.domain.Cell;
-import net.blabux.mentagy.domain.Piece;
-import net.blabux.mentagy.domain.exception.PieceParseException;
-import net.blabux.mentagy.domain.exception.RuleViolation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static net.blabux.mentagy.gui.GameComponent.RULE_FAILED_PROPERTY;
+import javax.swing.JComponent;
+import javax.swing.border.LineBorder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.blabux.mentagy.domain.Cell;
+import net.blabux.mentagy.domain.Piece;
+import net.blabux.mentagy.domain.exception.PieceParseException;
+import net.blabux.mentagy.domain.exception.RuleViolation;
 
 public class CellComponent extends JComponent {
     private static final Logger LOG = LoggerFactory.getLogger(CellComponent.class);

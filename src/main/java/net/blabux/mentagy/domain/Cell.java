@@ -1,11 +1,10 @@
 package net.blabux.mentagy.domain;
 
-import net.blabux.mentagy.domain.exception.RuleViolation;
-
-import java.beans.PropertyChangeEvent;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import net.blabux.mentagy.domain.exception.RuleViolation;
 
 public class Cell implements Comparable<Cell> {
     final Board board;

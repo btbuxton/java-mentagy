@@ -1,16 +1,18 @@
 package net.blabux.mentagy.gui;
 
-import net.blabux.mentagy.domain.Board;
-import net.blabux.mentagy.domain.Piece;
+import java.awt.BorderLayout;
+import java.util.Iterator;
+import java.util.stream.IntStream;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.IntStream;
+
+import net.blabux.mentagy.domain.Board;
+import net.blabux.mentagy.domain.Piece;
 
 public class GameComponent extends JPanel {
     public static final String RULE_FAILED_PROPERTY = "ruleFailed";

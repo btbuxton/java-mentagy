@@ -1,23 +1,30 @@
 package net.blabux.mentagy.start;
 
-import net.blabux.mentagy.domain.Board;
-import net.blabux.mentagy.domain.BoardDefinition;
-import net.blabux.mentagy.gui.GameComponent;
-import net.blabux.mentagy.loader.BoardDefinitionLoader;
-import net.blabux.mentagy.loader.SimpleBoardDefinitionLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.blabux.mentagy.domain.Board;
+import net.blabux.mentagy.domain.BoardDefinition;
+import net.blabux.mentagy.gui.GameComponent;
+import net.blabux.mentagy.loader.BoardDefinitionLoader;
+import net.blabux.mentagy.loader.SimpleBoardDefinitionLoader;
 
 public class Mentagy {
     private static final Logger LOG = LoggerFactory.getLogger(Mentagy.class);

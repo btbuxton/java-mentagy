@@ -91,7 +91,7 @@ public class Cell implements Comparable<Cell> {
         return series(Piece::previous);
     }
 
-    public void set(Piece piece) {
+    public void set(Piece piece) throws RuleViolation {
         if (this.piece.equals(piece)) {
             return;
         }
@@ -107,14 +107,22 @@ public class Cell implements Comparable<Cell> {
         if (locked) {
             throw new IllegalStateException("Cell is locked");
         }
-        forceSet(piece);
-    }
-
-    void forceSet(Piece piece) {
         Piece oldPiece = this.piece;
         this.piece = piece;
-        board.pieceMoved(oldPiece, this.piece);
+        try {
+        	checkRules();
+        } catch(RuleViolation violation) {
+        	this.piece = oldPiece;
+        	throw violation;
+        }
+        board.pieceMoved(this, oldPiece, this.piece);
     }
+    
+	public void forceSet(Piece newPiece) {
+		Piece old = this.piece;
+		this.piece = newPiece;
+		board.pieceMoved(this, old, newPiece);
+	}
 
     @Override
     public String toString() {
@@ -141,6 +149,5 @@ public class Cell implements Comparable<Cell> {
         }
         return null;
     }
-
 
 }

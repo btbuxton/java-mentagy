@@ -2,6 +2,7 @@ package net.blabux.mentagy.domain;
 
 import net.blabux.mentagy.domain.exception.*;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.StringReader;
@@ -193,8 +194,9 @@ public class Board {
         piecesAreInOrder();
     }
 
-    void pieceMoved(Piece oldPiece, Piece newPiece) {
-        propertyChangeSupport.firePropertyChange(PIECE_MOVED_PROPERTY, oldPiece, newPiece);
+    void pieceMoved(Cell cell, Piece oldPiece, Piece newPiece) {
+    	PropertyChangeEvent change = new PropertyChangeEvent(cell, PIECE_MOVED_PROPERTY, oldPiece, newPiece);
+        propertyChangeSupport.firePropertyChange(change);
     }
 
 }

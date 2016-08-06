@@ -122,4 +122,8 @@ public class Piece implements Comparable<Piece> {
         return new String(new char[]{value});
     }
     
+    public String toString() {
+    	return value();
+    }
+    
 }

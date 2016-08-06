@@ -180,18 +180,14 @@ public class CellComponent extends JComponent {
                     flash();
                     return;
                 }
-                Piece previous = cell.get();
                 try {
                     cell.set(piece);
-                    cell.checkRules();
                 } catch (RuleViolation ex) {
                     LOG.warn("Rule Failed {}", ex.getMessage());
                     getGameComponent().ruleFailed(ex.getMessage());
-                    cell.set(previous);
                     flash();
                 } catch (IllegalStateException ex) {
                     LOG.warn(ex.getMessage());
-                    cell.set(previous);
                     flash();
                 }
                 repaint();
@@ -238,7 +234,6 @@ public class CellComponent extends JComponent {
                 try {
                     Piece piece = (Piece) dtde.getTransferable().getTransferData(PieceTransferable.DATA_FLAVOR);
                     cell.set(piece);
-                    cell.checkRules();
                     success = true;
                     repaint();
                 } catch (UnsupportedFlavorException e) {
@@ -252,7 +247,6 @@ public class CellComponent extends JComponent {
                 if (success) {
                     dtde.dropComplete(true);
                 } else {
-                    cell.set(Piece.BLANK);
                     dtde.dropComplete(false);
                 }
             }

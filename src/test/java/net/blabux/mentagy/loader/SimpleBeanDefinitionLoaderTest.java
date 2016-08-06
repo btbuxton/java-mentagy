@@ -1,17 +1,16 @@
 package net.blabux.mentagy.loader;
 
-import net.blabux.mentagy.domain.Board;
-import net.blabux.mentagy.domain.BoardDefinition;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
+
+import net.blabux.mentagy.domain.Board;
+import net.blabux.mentagy.domain.BoardDefinition;
 
 /**
  * Created by btbuxton on 5/30/16.

@@ -58,7 +58,7 @@ public class CellComponent extends JComponent {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Rectangle bounds = g.getClipBounds();
+        Rectangle bounds = getBounds();
         if (cell.isLocked()) {
             g.setColor(Color.RED);
         } else {

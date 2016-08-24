@@ -2,6 +2,7 @@ package net.blabux.mentagy.gui;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -12,6 +13,8 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -40,14 +43,8 @@ public class CellComponent extends JComponent {
 
     public CellComponent(Cell cell) {
         this.cell = cell;
+        setInitialSize(16);
         initialize();
-    }
-
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        Font biggerFont = getFont().deriveFont(48.0f).deriveFont(Font.BOLD);
-        setFont(biggerFont);
     }
 
     @Override
@@ -209,6 +206,14 @@ public class CellComponent extends JComponent {
 
         });
         initializeDragTarget();
+        addComponentListener(new ComponentAdapter() {
+        	@Override
+        	public void componentResized(ComponentEvent e) {
+				int size = Math.min(getWidth(), getHeight());
+				Font biggerFont = getFont().deriveFont((float) size / 2).deriveFont(Font.BOLD);
+				setFont(biggerFont);
+        	}
+        });
     }
 
     private GameComponent getGameComponent() {
@@ -253,5 +258,10 @@ public class CellComponent extends JComponent {
         });
 
     }
+    
+	private void setInitialSize(int size) {
+		setMinimumSize(new Dimension(size, size));
+		setPreferredSize(new Dimension(size * 3, size * 3));
+	}
 
 }

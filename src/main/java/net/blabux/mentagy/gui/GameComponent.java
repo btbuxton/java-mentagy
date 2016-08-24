@@ -27,19 +27,6 @@ public class GameComponent extends JPanel {
         firePropertyChange(RULE_FAILED_PROPERTY, null, ruleMessage);
     }
 
-    private JComponent createBottomPanel(Iterator<Piece> pieces) {
-        JPanel result = new JPanel();
-        result.setBorder(createPanelBorder());
-        result.setLayout(new BoxLayout(result, BoxLayout.X_AXIS));
-
-        IntStream.range(0, 10).forEach((index) -> {
-            result.add(Box.createHorizontalGlue());
-            result.add(createFreePiece(pieces));
-        });
-        result.remove(0);
-        return result;
-    }
-
     private JComponent createFreePiece(Iterator<Piece> pieces) {
         return new PieceComponent(board, pieces.next());
     }
@@ -95,7 +82,6 @@ public class GameComponent extends JPanel {
         add(createLeftPanel(pieces), BorderLayout.WEST);
         add(createTopPanel(pieces), BorderLayout.NORTH);
         add(createRightPanel(pieces), BorderLayout.EAST);
-        add(createBottomPanel(pieces), BorderLayout.SOUTH);
     }
 
 }

@@ -6,10 +6,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.Rectangle2D;
 
 public class PieceComponent extends JComponent {
-	private static final int SIZE = 32;
 	private static final long serialVersionUID = -5251681235742245097L;
 	private final BoardComponent board;
 	private final Piece original;
@@ -19,16 +20,8 @@ public class PieceComponent extends JComponent {
 		this.board = board;
 		this.original = piece;
 		this.piece = piece;
+		setInitialSize(16);
 		initialize();
-	}
-
-	@Override
-	public void addNotify() {
-		super.addNotify();
-		int size = SIZE;
-		setInitialSize(size);
-		Font biggerFont = getFont().deriveFont((float) size / 2).deriveFont(Font.BOLD);
-		setFont(biggerFont);
 	}
 
 	private void centerText(Graphics g, Rectangle bounds, String text) {
@@ -47,7 +40,7 @@ public class PieceComponent extends JComponent {
 				if (isOnBoard()) {
 					return;
 				}
-				Image image = createImage(SIZE, SIZE);
+				Image image = createImage(32, 32);
 				paint(image.getGraphics());
 				Transferable transferable = new PieceTransferable(piece);
 				DragSourceListener dsl = new DragSourceAdapter() {
@@ -65,6 +58,14 @@ public class PieceComponent extends JComponent {
 				repaint();
 			}
 		});
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				int size = Math.min(getWidth(), getHeight());
+				Font biggerFont = getFont().deriveFont((float) size / 2).deriveFont(Font.BOLD);
+				setFont(biggerFont);
+			}
+		});
 	}
 
 	private boolean isOnBoard() {
@@ -73,8 +74,7 @@ public class PieceComponent extends JComponent {
 
 	private void setInitialSize(int size) {
 		setMinimumSize(new Dimension(size, size));
-		setMaximumSize(new Dimension(size, size));
-		setPreferredSize(new Dimension(size, size));
+		setPreferredSize(new Dimension(size * 3, size * 3));
 	}
 
 	@Override

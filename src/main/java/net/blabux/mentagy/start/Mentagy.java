@@ -58,7 +58,7 @@ public class Mentagy {
 		gameComp.addPropertyChangeListener(GameComponent.RULE_FAILED_PROPERTY, (event) -> {
 			statusPanel.setText(String.valueOf(event.getNewValue()));
 		});
-		frame.setSize(480, 500);
+		frame.pack(); //setSize(480, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		createMenuBar(board);
 		frame.setVisible(true);

@@ -62,6 +62,7 @@ public class Mentagy {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		createMenuBar(board);
 		frame.setVisible(true);
+		frame.repaint();
 
 	}
 

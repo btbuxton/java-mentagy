@@ -74,7 +74,7 @@ public class PieceComponent extends JComponent {
 
 	private void setInitialSize(int size) {
 		setMinimumSize(new Dimension(size, size));
-		setPreferredSize(new Dimension(size * 3, size * 3));
+		setPreferredSize(new Dimension(size * 2, size * 2));
 	}
 
 	@Override
